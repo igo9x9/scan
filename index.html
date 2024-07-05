@@ -178,12 +178,12 @@ document.getElementById("scan").addEventListener("click", e => {
             const g1 = imagedata1.data[1];
             const b1 = imagedata1.data[2];
 
-            const imagedata2 = ctx1.getImageData(x - 2, y - 2, 1, 1);
+            const imagedata2 = ctx1.getImageData(x + 2, y - 2, 1, 1);
             const r2 = imagedata2.data[0];
             const g2 = imagedata2.data[1];
             const b2 = imagedata2.data[2];
 
-            const imagedata3 = ctx1.getImageData(x + 2, y + 2, 1, 1);
+            const imagedata3 = ctx1.getImageData(x - 2, y + 2, 1, 1);
             const r3 = imagedata3.data[0];
             const g3 = imagedata3.data[1];
             const b3 = imagedata3.data[2];
@@ -192,9 +192,9 @@ document.getElementById("scan").addEventListener("click", e => {
                 && (r2 < 80 && g2 < 80 && b2 < 80)
                 && (r3 < 80 && g3 < 80 && b3 < 80);
 
-            const isWhite = (r1 > 200 && g1 > 200 && b1 > 200) 
-                && (r2 > 200 && g2 > 200 && b2 > 200)
-                && (r3 > 200 && g3 > 200 && b3 > 200);
+            const isWhite = (r1 > 150 && g1 > 150 && b1 > 150) 
+                && (r2 > 150 && g2 > 150 && b2 > 150)
+                && (r3 > 150 && g3 > 150 && b3 > 150);
 
             if (isBlack) {
                 row += "●";
@@ -241,7 +241,7 @@ image.addEventListener("load",function (){
     // canvas.width = image.naturalWidth;
     // canvas.height = image.naturalHeight;
 
-    imgScale = canvas1.height / image.naturalHeight;
+    imgScale = canvas1.width / image.naturalWidth;
     ctx1.save();
     ctx1.scale(imgScale, imgScale);
     ctx1.clearRect(0, 0, 1000, 1000);
