@@ -34,39 +34,37 @@
     <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
 </div>
 
-<div>
-
-    <div style="text-align:center">
-        <input type="file" id="file">
-    </div>
-
-    <div style="text-align:center; margin-top: 20px;">
-        <button id="up">上</button>
-    </div>
-    <div style="text-align:center; margin-top: 10px;">
-        <button id="left" style="margin-right: 10px;">左</button>
-        <button id="right" style="margin-left: 10px;">右</button>
-    </div>
-    <div style="text-align:center; margin-top: 10px;">
-        <button id="down">下</button>
-    </div>
-
-    <div style="text-align:center; margin-top: 20px;">
-        <button id="zoomin">拡大</button>
-        <button id="zoomout">縮小</button>
-    </div>
-
-    <hr>
-
-    <div style="text-align:center; margin-top: 20px;">
-        <button id="scan">スキャン</button>
-    </div>
-
-    <pre id="result" style="font-family: monospace;"></pre>
-
+<div style="text-align:center">
+    <input type="file" id="file">
 </div>
 
-<div id="test" style="width: 300px; height: 300px"></div>
+<div style="text-align:center; margin-top: 20px;">
+    <button id="up">上</button>
+</div>
+<div style="text-align:center; margin-top: 10px;">
+    <button id="left" style="margin-right: 10px;">左</button>
+    <button id="right" style="margin-left: 10px;">右</button>
+</div>
+<div style="text-align:center; margin-top: 10px;">
+    <button id="down">下</button>
+</div>
+
+<div style="text-align:center; margin-top: 20px;">
+    <button id="zoomin">拡大</button>
+    <button id="zoomout">縮小</button>
+</div>
+
+<hr>
+
+<div style="text-align:center; margin-top: 20px;">
+    <button id="scan">スキャン</button>
+</div>
+
+<div style="text-align:center; margin-top: 20px;">
+    <textarea id="result" style="width:320px;" rows="5"></textarea>
+
+    <div id="test" style="width: 320px; height: 320px"></div>
+</div>
 
 
 <script>
@@ -168,10 +166,10 @@ document.getElementById("scan").addEventListener("click", e => {
     let sgf = "(;";
 
     let yy = 0;
-    for (y = 11; y <= 300; y += unitHeight) {
+    for (y = 11; y <= 310; y += unitHeight) {
         let row = "";
         let xx = 0;
-        for (x = 11; x <= 300; x += unitWidth) {
+        for (x = 11; x <= 310; x += unitWidth) {
 
             const imagedata1 = ctx1.getImageData(x, y, 1, 1);
             const r1 = imagedata1.data[0];
@@ -188,9 +186,9 @@ document.getElementById("scan").addEventListener("click", e => {
             const g3 = imagedata3.data[1];
             const b3 = imagedata3.data[2];
 
-            const isBlack = (r1 < 80 && g1 < 80 && b1 < 80) 
-                && (r2 < 80 && g2 < 80 && b2 < 80)
-                && (r3 < 80 && g3 < 80 && b3 < 80);
+            const isBlack = (r1 < 100 && g1 < 100 && b1 < 100) 
+                && (r2 < 100 && g2 < 100 && b2 < 100)
+                && (r3 < 100 && g3 < 100 && b3 < 100);
 
             const isWhite = (r1 > 150 && g1 > 150 && b1 > 150) 
                 && (r2 > 150 && g2 > 150 && b2 > 150)
