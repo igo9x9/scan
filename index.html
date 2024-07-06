@@ -17,7 +17,7 @@
     </style>
 </head>
 
-<div style="text-align:center">
+<div style="text-align:center;display: none;">
     <video id="video" width="320" height="320" style="border: 1px solid #000"></video>
 </div>
 
@@ -30,36 +30,36 @@
     <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
 </div>
 
-<div style="text-align:center">
+<div style="text-align:center;display: none;">
     <input type="file" id="file">
 </div>
 
-<div style="text-align:center; margin-top: 20px;">
+<div style="text-align:center; margin-top: 20px;;display: none;">
     <button id="up">上</button>
 </div>
-<div style="text-align:center; margin-top: 10px;">
+<div style="text-align:center; margin-top: 10px;;display: none;">
     <button id="left" style="margin-right: 10px;">左</button>
     <button id="right" style="margin-left: 10px;">右</button>
 </div>
-<div style="text-align:center; margin-top: 10px;">
+<div style="text-align:center; margin-top: 10px;;display: none;">
     <button id="down">下</button>
 </div>
 
-<div style="text-align:center; margin-top: 20px;">
+<div style="text-align:center; margin-top: 20px;;display: none;">
     <button id="zoomin">拡大</button>
     <button id="zoomout">縮小</button>
 </div>
 
-<hr>
 
 <div style="text-align:center; margin-top: 20px;">
     <button id="scan">スキャン</button>
 </div>
 
 <div style="text-align:center; margin-top: 20px;">
-    <textarea id="result" style="width:320px;" rows="5"></textarea>
 
     <div id="test" style="width: 320px; height: 320px"></div>
+
+    <textarea id="result" style="width:320px;" rows="5"></textarea>
 </div>
 
 
@@ -217,13 +217,13 @@ document.getElementById("scan").addEventListener("click", e => {
             const g3 = imagedata3.data[1];
             const b3 = imagedata3.data[2];
 
-            const isBlack = (r1 < 100 && g1 < 100 && b1 < 100) 
-                && (r2 < 100 && g2 < 100 && b2 < 100)
-                && (r3 < 100 && g3 < 100 && b3 < 100);
+            const isBlack = (r1 < 80 && g1 < 80 && b1 < 80) 
+                && (r2 < 80 && g2 < 80 && b2 < 80)
+                && (r3 < 80 && g3 < 80 && b3 < 80);
 
-            const isWhite = (r1 > 150 && g1 > 150 && b1 > 150) 
-                && (r2 > 150 && g2 > 150 && b2 > 150)
-                && (r3 > 150 && g3 > 150 && b3 > 150);
+            const isWhite = (r1 > 130 && g1 > 130 && b1 > 150) 
+                && (r2 > 130 && g2 > 130 && b2 > 150)
+                && (r3 > 130 && g3 > 130 && b3 > 150);
 
             if (isBlack) {
                 row += "●";
@@ -307,13 +307,13 @@ function drawGrid() {
             const g3 = imagedata3.data[1];
             const b3 = imagedata3.data[2];
 
-            const isBlack = (r1 < 100 && g1 < 100 && b1 < 100) 
-                && (r2 < 100 && g2 < 100 && b2 < 100)
-                && (r3 < 100 && g3 < 100 && b3 < 100);
+            const isBlack = (r1 < 80 && g1 < 80 && b1 < 80) 
+                && (r2 < 80 && g2 < 80 && b2 < 80)
+                && (r3 < 80 && g3 < 80 && b3 < 80);
 
-            const isWhite = (r1 > 150 && g1 > 150 && b1 > 150) 
-                && (r2 > 150 && g2 > 150 && b2 > 150)
-                && (r3 > 150 && g3 > 150 && b3 > 150);
+            const isWhite = (r1 > 130 && g1 > 130 && b1 > 150) 
+                && (r2 > 130 && g2 > 130 && b2 > 150)
+                && (r3 > 130 && g3 > 130 && b3 > 150);
 
             ctx2.beginPath();
             if (isBlack) {
