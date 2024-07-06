@@ -94,6 +94,7 @@ _canvasUpdate();
 function _canvasUpdate() {
     ctx1.drawImage(video, 0, 0, canvas1.width, canvas1.height);
     requestAnimationFrame(_canvasUpdate);
+    drawGrid();
 };
 
 
@@ -179,6 +180,8 @@ function update() {
     ctx1.scale(imgScale, imgScale);
     ctx1.drawImage(image, imgX, imgY);
     ctx1.restore();
+
+    drawGrid();
 }
 
 
@@ -275,6 +278,9 @@ image.src = "goban.png";
 drawGrid();
 
 function drawGrid() {
+
+    ctx2.clearRect(0, 0, 1000, 1000);
+
     ctx2.lineWidth = 1.0;
     ctx2.strokeStyle = "red";
     ctx2.strokeRect(10, 10, 300, 300);
@@ -285,10 +291,44 @@ function drawGrid() {
     for (y = 11; y <= 310; y += unitHeight) {
 
         for (x = 11; x <= 310; x += unitWidth) {
+
+            const imagedata1 = ctx1.getImageData(x, y, 1, 1);
+            const r1 = imagedata1.data[0];
+            const g1 = imagedata1.data[1];
+            const b1 = imagedata1.data[2];
+
+            const imagedata2 = ctx1.getImageData(x + 2, y - 2, 1, 1);
+            const r2 = imagedata2.data[0];
+            const g2 = imagedata2.data[1];
+            const b2 = imagedata2.data[2];
+
+            const imagedata3 = ctx1.getImageData(x - 2, y + 2, 1, 1);
+            const r3 = imagedata3.data[0];
+            const g3 = imagedata3.data[1];
+            const b3 = imagedata3.data[2];
+
+            const isBlack = (r1 < 100 && g1 < 100 && b1 < 100) 
+                && (r2 < 100 && g2 < 100 && b2 < 100)
+                && (r3 < 100 && g3 < 100 && b3 < 100);
+
+            const isWhite = (r1 > 150 && g1 > 150 && b1 > 150) 
+                && (r2 > 150 && g2 > 150 && b2 > 150)
+                && (r3 > 150 && g3 > 150 && b3 > 150);
+
             ctx2.beginPath();
-            ctx2.fillStyle = 'green';
-            ctx2.arc(x, y, 1, 0, Math.PI * 2, true);
+            if (isBlack) {
+                ctx2.fillStyle = 'yellow';
+                ctx2.arc(x, y, 5, 0, Math.PI * 2, true);
+            } else if (isWhite) {
+                ctx2.fillStyle = 'red';
+                ctx2.arc(x, y, 5, 0, Math.PI * 2, true);
+            } else {
+                ctx2.fillStyle = 'green';
+                ctx2.arc(x, y, 1, 0, Math.PI * 2, true);
+            }
             ctx2.fill();
+
+
         }
 
     }
