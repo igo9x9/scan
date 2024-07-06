@@ -16,15 +16,11 @@
         }
     </style>
 </head>
-  
 
+<div style="text-align:center">
+    <video id="video" width="320" height="320" style="border: 1px solid #000"></video>
+</div>
 
-<!-- <div>
-    <div class="canvas-wrapper">
-        <canvas id="canvas1" width="320" height="320" style="border: 1px solid #000"></canvas>
-        <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
-    </div>
-</div> -->
 
 <div style="text-align:center">
     <canvas id="canvas1" width="320" height="320" style="border: 1px solid #000"></canvas>
@@ -68,6 +64,37 @@
 
 
 <script>
+
+const canvas1 = document.getElementById('canvas1');
+const ctx1 = canvas1.getContext('2d');
+
+const canvas2 = document.getElementById('canvas2');
+const ctx2 = canvas2.getContext('2d');
+
+const image = new Image();
+
+const video = document.getElementById('video');
+video.autoplay = true;
+
+const resolution = { w: 320, h: 320 };
+
+const media = navigator.mediaDevices.getUserMedia({
+  audio: false,
+  video: {
+    width: { ideal: resolution.w },
+    height: { ideal: resolution.h }
+  }
+}).then(function(stream) {
+  video.srcObject = stream;
+});
+
+_canvasUpdate();
+
+function _canvasUpdate() {
+    ctx1.drawImage(video, 0, 0, canvas1.width, canvas1.height);
+    requestAnimationFrame(_canvasUpdate);
+};
+
 
 let imgScale = 1;
 let imgX = 0, imgY = 0;
@@ -155,7 +182,7 @@ function update() {
 
 
 document.getElementById("scan").addEventListener("click", e => {
-    update();
+    // update();
 
     const unitWidth = 280 / 17;
     const unitHeight = 280 / 17;
@@ -227,13 +254,6 @@ document.getElementById("scan").addEventListener("click", e => {
 });
 
 
-const canvas1 = document.getElementById('canvas1');
-const ctx1 = canvas1.getContext('2d');
-
-const canvas2 = document.getElementById('canvas2');
-const ctx2 = canvas2.getContext('2d');
-
-const image = new Image();
 
 image.addEventListener("load",function (){
     // canvas.width = image.naturalWidth;
