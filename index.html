@@ -188,19 +188,21 @@ function update() {
 document.getElementById("scan").addEventListener("click", e => {
     // update();
 
-    const unitWidth = 280 / 17;
-    const unitHeight = 280 / 17;
+    const unitWidth = 300 / 8;
+    const unitHeight = 300 / 8;
 
     const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split("");
     let hoge = "";
-    // let sgf = "(;FF[4]GM[1]SZ[19];";
-    let sgf = "(;";
+    let sgf = "(;FF[4]GM[1]SZ[9]";
+    // let sgf = "(;";
+    let sgf_b = "";
+    let sgf_w = "";
 
     let yy = 0;
-    for (y = 11; y <= 310; y += unitHeight) {
+    for (y = 10; y <= 320; y += unitHeight) {
         let row = "";
         let xx = 0;
-        for (x = 11; x <= 310; x += unitWidth) {
+        for (x = 10; x <= 320; x += unitWidth) {
 
             const imagedata1 = ctx1.getImageData(x, y, 1, 1);
             const r1 = imagedata1.data[0];
@@ -227,10 +229,10 @@ document.getElementById("scan").addEventListener("click", e => {
 
             if (isBlack) {
                 row += "●";
-                sgf += "AB[" + alphabet[xx] + alphabet[yy] + "]";
+                sgf_b += "[" + alphabet[xx] + alphabet[yy] + "]";
             } else if (isWhite) {
                 row += "○";
-                sgf += "AW[" + alphabet[xx] + alphabet[yy] + "]";
+                sgf_w += "[" + alphabet[xx] + alphabet[yy] + "]";
             } else {
                 row += "　";
             }
@@ -242,7 +244,7 @@ document.getElementById("scan").addEventListener("click", e => {
         yy += 1;
         hoge += row + "\n";
     }
-    sgf += ")";
+    sgf += "AB" + sgf_b + "AW" + sgf_w + ")";
 
     document.getElementById("result").innerText = sgf;
 
@@ -285,12 +287,12 @@ function drawGrid() {
     ctx2.strokeStyle = "red";
     ctx2.strokeRect(10, 10, 300, 300);
 
-    const unitWidth = 280 / 17;
-    const unitHeight = 280 / 17;
+    const unitWidth = 300 / 8;
+    const unitHeight = 300 / 8;
 
-    for (y = 11; y <= 310; y += unitHeight) {
+    for (y = 10; y <= 320; y += unitHeight) {
 
-        for (x = 11; x <= 310; x += unitWidth) {
+        for (x = 10; x <= 320; x += unitWidth) {
 
             const imagedata1 = ctx1.getImageData(x, y, 1, 1);
             const r1 = imagedata1.data[0];
