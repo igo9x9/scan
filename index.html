@@ -60,6 +60,8 @@
 
 <script>
 
+const gobanSize = 19;
+
 const canvas1 = document.getElementById('canvas1');
 const ctx1 = canvas1.getContext('2d');
 
@@ -93,7 +95,7 @@ canvas2.addEventListener("touchmove", function(e) {
     if ( cur_tp !=- 1 ) {
         dt[cur_tp][0] = curx;
         dt[cur_tp][1] = cury;
-        dsp2();
+        dspp();
     }
 }, true);
 
@@ -153,12 +155,12 @@ function dspp() {
     const pointsX1 = [];
     const pointsY1 = [];
 
-    const stepX1 = (dt[3][0] - dt[0][0]) / 8;
-    const stepY1 = (dt[3][1] - dt[0][1]) / 8;
-    const stepX2 = (dt[2][0] - dt[1][0]) / 8;
-    const stepY2 = (dt[2][1] - dt[1][1]) / 8;
+    const stepX1 = (dt[3][0] - dt[0][0]) / (gobanSize - 1);
+    const stepY1 = (dt[3][1] - dt[0][1]) / (gobanSize - 1);
+    const stepX2 = (dt[2][0] - dt[1][0]) / (gobanSize - 1);
+    const stepY2 = (dt[2][1] - dt[1][1]) / (gobanSize - 1);
 
-    for (let index = 0; index <= 8; index += 1) {
+    for (let index = 0; index <= (gobanSize - 1); index += 1) {
         const x1 = dt[0][0] + stepX1 * index;
         const y1 = dt[0][1] + stepY1 * index;
         drawCircle(x1, y1, 2, "#ffff00");
@@ -177,12 +179,12 @@ function dspp() {
     const pointsX2 = [];
     const pointsY2 = [];
 
-    const stepX3 = (dt[1][0] - dt[0][0]) / 8;
-    const stepY3 = (dt[1][1] - dt[0][1]) / 8;
-    const stepX4 = (dt[2][0] - dt[3][0]) / 8;
-    const stepY4 = (dt[2][1] - dt[3][1]) / 8;
+    const stepX3 = (dt[1][0] - dt[0][0]) / (gobanSize - 1);
+    const stepY3 = (dt[1][1] - dt[0][1]) / (gobanSize - 1);
+    const stepX4 = (dt[2][0] - dt[3][0]) / (gobanSize - 1);
+    const stepY4 = (dt[2][1] - dt[3][1]) / (gobanSize - 1);
 
-    for (let index = 0; index <= 8; index += 1) {
+    for (let index = 0; index <= (gobanSize - 1); index += 1) {
         const x1 = dt[0][0] + stepX3 * index;
         const y1 = dt[0][1] + stepY3 * index;
         drawCircle(x1, y1, 2, "yellow");
@@ -209,13 +211,13 @@ function dspp() {
         
             const color = getStoneColor(point.x, point.y);
             if (color === "B") {
-                drawCircle(point.x, point.y, 3, "black");
+                drawCircle(point.x, point.y, 3, "green");
                 sgfSetup += "AB[" + alphabet[x/2] + alphabet[y/2] + "]";
             } else if (color === "W") {
-                drawCircle(point.x, point.y, 3, "white");
+                drawCircle(point.x, point.y, 3, "green");
                 sgfSetup += "AW[" + alphabet[x/2] + alphabet[y/2] + "]";
-            } else {
-                drawCircle(point.x, point.y, 3, "yellow");
+            // } else {
+            //     drawCircle(point.x, point.y, 3, "yellow");
             }
         }
     }
@@ -227,7 +229,7 @@ let sgfSetup = "";
 function chkxy(mx, my) {
 
     for ( i = 0 ; i < dt.length ; i++ ) {
-        if ((dt[i][0] - 50 < mx && mx < dt[i][0] + 50) &&  (dt[i][1] - 50 < my && my < dt[i][1] + 50) ) { 
+        if ((dt[i][0] - 5 < mx && mx < dt[i][0] + 5) &&  (dt[i][1] - 5 < my && my < dt[i][1] + 5) ) { 
             cur_tp = i;
             dspp();
             return true;
@@ -307,7 +309,7 @@ document.getElementById("zoomout").addEventListener("pointerdown", e => {
 
 document.getElementById("up").addEventListener("pointerdown", e => {
     const intervalId = setInterval(() => {
-        imgY -= 1;
+        imgY -= 5;
         update();
     }, 50);
     document.addEventListener('pointerup', () => {        
@@ -317,7 +319,7 @@ document.getElementById("up").addEventListener("pointerdown", e => {
 
 document.getElementById("down").addEventListener("pointerdown", e => {
     const intervalId = setInterval(() => {
-        imgY += 1;
+        imgY += 5;
         update();
     }, 50);
     document.addEventListener('pointerup', () => {        
@@ -327,7 +329,7 @@ document.getElementById("down").addEventListener("pointerdown", e => {
 
 document.getElementById("left").addEventListener("pointerdown", e => {
     const intervalId = setInterval(() => {
-        imgX -= 1;
+        imgX -= 5;
         update();
     }, 50);
     document.addEventListener('pointerup', () => {        
@@ -337,7 +339,7 @@ document.getElementById("left").addEventListener("pointerdown", e => {
 
 document.getElementById("right").addEventListener("pointerdown", e => {
     const intervalId = setInterval(() => {
-        imgX += 1;
+        imgX += 5;
         update();
     }, 50);
     document.addEventListener('pointerup', () => {        
@@ -408,7 +410,7 @@ document.getElementById("scan").addEventListener("click", e => {
 
     // const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split("");
     // let hoge = "";
-    let sgf = "(;FF[4]GM[1]SZ[9]";
+    let sgf = "(;FF[4]GM[1]SZ[" + gobanSize + "]";
     // let sgf = "(;";
 
     // let yy = 0;
