@@ -163,13 +163,13 @@ function dspp() {
     for (let index = 0; index <= (gobanSize - 1); index += 1) {
         const x1 = dt[0][0] + stepX1 * index;
         const y1 = dt[0][1] + stepY1 * index;
-        drawCircle(x1, y1, 2, "#ffff00");
+        drawCircle(x1, y1, 2, "gray");
 
         const x2 = dt[1][0] + stepX2 * index;
         const y2 = dt[1][1] + stepY2 * index;
-        drawCircle(x2, y2, 2, "#ffff00");
+        drawCircle(x2, y2, 2, "gray");
 
-        drawLine(x1, y1, x2, y2, 1, "#ffff00");
+        drawLine(x1, y1, x2, y2, 1, "gray");
         pointsX1.push(x1);
         pointsX1.push(x2);
         pointsY1.push(y1);
@@ -186,14 +186,20 @@ function dspp() {
 
     for (let index = 0; index <= (gobanSize - 1); index += 1) {
         const x1 = dt[0][0] + stepX3 * index;
-        const y1 = dt[0][1] + stepY3 * index;
-        drawCircle(x1, y1, 2, "yellow");
-
+        let y1 = dt[0][1] + stepY3 * index;
         const x2 = dt[3][0] + stepX4 * index;
-        const y2 = dt[3][1] + stepY4 * index;
-        drawCircle(x2, y2, 2, "yellow");
+        let y2 = dt[3][1] + stepY4 * index;
 
-        drawLine(x1, y1, x2, y2, 1, "yellow");
+        if (gobanSize === 19 && (dt[0][0] - dt[1][0] > 5 || dt[2][0] - dt[3][0] > 5)) {
+            const y = trans3D(index, y1, y2);
+            y1 = y.y1;
+            y2 = y.y2;
+        }
+
+        drawCircle(x1, y1, 2, "gray");
+        drawCircle(x2, y2, 2, "gray");
+
+        drawLine(x1, y1, x2, y2, 1, "gray");
         pointsX2.push(x1);
         pointsX2.push(x2);
         pointsY2.push(y1);
@@ -211,10 +217,10 @@ function dspp() {
         
             const color = getStoneColor(point.x, point.y);
             if (color === "B") {
-                drawCircle(point.x, point.y, 3, "green");
+                drawCircle(point.x, point.y, 3, "yellow");
                 sgfSetup += "AB[" + alphabet[x/2] + alphabet[y/2] + "]";
             } else if (color === "W") {
-                drawCircle(point.x, point.y, 3, "green");
+                drawCircle(point.x, point.y, 3, "yellow");
                 sgfSetup += "AW[" + alphabet[x/2] + alphabet[y/2] + "]";
             // } else {
             //     drawCircle(point.x, point.y, 3, "yellow");
@@ -224,12 +230,54 @@ function dspp() {
 
 }
 
+function trans3D(index, y1, y2) {
+
+    switch (index) {
+        case 1:
+        case 2:
+        case 3:
+            y1 -= 3;
+            y2 -= 3;
+            break;
+        case 4:
+        case 5:
+        case 6:
+            y1 -= 4;
+            y2 -= 4;
+            break;
+        case 7:
+        case 8:
+        case 9:
+            y1 -= 5;
+            y2 -= 5;
+            break;
+        case 10:
+        case 11:
+        case 12:
+            y1 -= 5;
+            y2 -= 5;
+            break;
+        case 13:
+        case 14:
+            y1 -= 5;
+            y2 -= 5;
+            break;
+        case 15:
+            y1 -= 4;
+            y2 -= 4;
+            break;
+    }
+
+    return {y1: y1, y2: y2};
+
+}
+
 let sgfSetup = "";
 
 function chkxy(mx, my) {
 
     for ( i = 0 ; i < dt.length ; i++ ) {
-        if ((dt[i][0] - 5 < mx && mx < dt[i][0] + 5) &&  (dt[i][1] - 5 < my && my < dt[i][1] + 5) ) { 
+        if ((dt[i][0] - 30 < mx && mx < dt[i][0] + 30) &&  (dt[i][1] - 30 < my && my < dt[i][1] + 30) ) { 
             cur_tp = i;
             dspp();
             return true;
@@ -377,7 +425,15 @@ function getIntersection(xA, yA, xB, yB, xC, yC, xD, yD) {
 // return "B" or "W" or ""
 function getStoneColor(x, y) {
 
-    const imagedata1 = ctx1.getImageData(x, y, 1, 1);
+    const blackMax = 80;
+    const whiteMin = 130;
+
+    const imagedata = ctx1.getImageData(x, y, 1, 1);
+    const r = imagedata.data[0];
+    const g = imagedata.data[1];
+    const b = imagedata.data[2];
+
+    const imagedata1 = ctx1.getImageData(x + 2, y + 2, 1, 1);
     const r1 = imagedata1.data[0];
     const g1 = imagedata1.data[1];
     const b1 = imagedata1.data[2];
@@ -392,13 +448,16 @@ function getStoneColor(x, y) {
     const g3 = imagedata3.data[1];
     const b3 = imagedata3.data[2];
 
-    const isBlack = (r1 < 80 && g1 < 80 && b1 < 80) 
-        && (r2 < 80 && g2 < 80 && b2 < 80)
-        && (r3 < 80 && g3 < 80 && b3 < 80);
+    const imagedata4 = ctx1.getImageData(x - 2, y - 2, 1, 1);
+    const r4 = imagedata4.data[0];
+    const g4 = imagedata4.data[1];
+    const b4 = imagedata4.data[2];
 
-    const isWhite = (r1 > 130 && g1 > 130 && b1 > 150) 
-        && (r2 > 130 && g2 > 130 && b2 > 150)
-        && (r3 > 130 && g3 > 130 && b3 > 150);
+    const isBlack = (r < blackMax && g < blackMax && b < blackMax)
+        && ((r1 < blackMax && g1 < blackMax && b1 < blackMax) || (r2 < blackMax && g2 < blackMax && b2 < blackMax) || (r3 < blackMax && g3 < blackMax && b3 < blackMax) || (r4 < blackMax && g4 < blackMax && b4 < blackMax));
+
+    const isWhite = (r > whiteMin && g > whiteMin && b > whiteMin)
+        && ((r1 > whiteMin && g1 > whiteMin && b1 > whiteMin) || (r2 > whiteMin && g2 > whiteMin && b2 > whiteMin) || (r3 > whiteMin && g3 > whiteMin && b3 > whiteMin) || (r4 > whiteMin && g4 > whiteMin && b4 > whiteMin));
 
     return isBlack ? "B" : (isWhite ? "W" : "");
 }
