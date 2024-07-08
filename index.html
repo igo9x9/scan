@@ -17,11 +17,6 @@
     </style>
 </head>
 
-<div style="text-align:center;display: none;">
-    <video id="video" width="320" height="320" style="border: 1px solid #000"></video>
-</div>
-
-
 <div style="text-align:center">
     <canvas id="canvas1" width="320" height="320" style="border: 1px solid #000"></canvas>
 </div>
@@ -30,22 +25,22 @@
     <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
 </div>
 
-<div style="text-align:center;display: none;">
+<div style="text-align:center">
     <input type="file" id="file">
 </div>
 
-<div style="text-align:center; margin-top: 20px;;display: none;">
+<div style="text-align:center; margin-top: 20px;">
     <button id="up">上</button>
 </div>
-<div style="text-align:center; margin-top: 10px;;display: none;">
+<div style="text-align:center; margin-top: 10px;">
     <button id="left" style="margin-right: 10px;">左</button>
     <button id="right" style="margin-left: 10px;">右</button>
 </div>
-<div style="text-align:center; margin-top: 10px;;display: none;">
+<div style="text-align:center; margin-top: 10px;">
     <button id="down">下</button>
 </div>
 
-<div style="text-align:center; margin-top: 20px;;display: none;">
+<div style="text-align:center; margin-top: 20px;">
     <button id="zoomin">拡大</button>
     <button id="zoomout">縮小</button>
 </div>
@@ -73,29 +68,205 @@ const ctx2 = canvas2.getContext('2d');
 
 const image = new Image();
 
-const video = document.getElementById('video');
-video.autoplay = true;
+let cur_tp = -1;
+let drawFlag = false;
+let curx, cury;
 
-const resolution = { w: 320, h: 320 };
+canvas2.addEventListener("mousemove", function(e) {
+    setxy(e, 0);
 
-const media = navigator.mediaDevices.getUserMedia({
-  audio: false,
-  video: {
-    facingMode: "environment",
-    width: { ideal: resolution.w },
-    height: { ideal: resolution.h }
-  }
-}).then(function(stream) {
-  video.srcObject = stream;
-});
+    if ( cur_tp !=- 1 ) {
+        dt[cur_tp][0] = curx;
+        dt[cur_tp][1] = cury;
+        dspp();
+    }
+}, true);
 
-_canvasUpdate();
+canvas2.addEventListener("mousedown", function(e) {
+    drawFlag = true;
+    setxy(e, 0);
+    chkxy(curx, cury);
+}, true);
 
-function _canvasUpdate() {
-    ctx1.drawImage(video, 0, 0, canvas1.width, canvas1.height);
-    requestAnimationFrame(_canvasUpdate);
-    drawGrid();
-};
+canvas2.addEventListener("touchmove", function(e) {
+    setxy(e, 1) ;
+    if ( cur_tp !=- 1 ) {
+        dt[cur_tp][0] = curx;
+        dt[cur_tp][1] = cury;
+        dsp2();
+    }
+}, true);
+
+canvas2.addEventListener("touchstart", function(e) {
+    drawFlag = true;
+    setxy(e, 1) ;
+    chkxy(curx, cury) ;
+}, true);
+
+canvas2.addEventListener("touchend", function(e) {
+    dspp();
+    drawFlag = false;
+    cur_tp = -1;
+}, true);
+
+canvas2.addEventListener("mouseup", function(e) {
+    dspp();
+    drawFlag = false;
+    cur_tp = -1;
+}, true);
+
+const dt = [[10, 10], [10, 320 - 10], [320 - 10, 320 - 10], [320 - 10, 10]] ;
+
+function setxy(e, f) {
+
+    e.preventDefault(); 
+
+    rect = e.target.getBoundingClientRect() ;
+
+    if ( f == 0 ) {
+        curx = e.clientX;
+        cury = e.clientY;
+    } else {
+        t = e.touches[0];
+        curx = t.pageX - window.pageXOffset;
+        cury = t.pageY  - window.pageYOffset;
+    }
+    curx  = curx - rect.left ;       
+    cury  = cury - rect.top ;
+
+}
+
+function dspp() {
+
+    ctx2.clearRect(0, 0, 1000, 1000);
+
+    for ( i = 0 ; i < dt.length - 1 ; i++ ) {
+        drawLine(dt[i][0], dt[i][1], dt[i+1][0], dt[i+1][1], 1, "#0000ff");
+    }
+
+    drawLine(dt[0][0], dt[0][1], dt[3][0], dt[3][1], 1, "#0000ff") ;
+
+    for ( i = 0 ; i < dt.length ; i++ ) {
+        drawCircle(dt[i][0], dt[i][1], 5, "#ff0000");
+    }
+
+    const pointsX1 = [];
+    const pointsY1 = [];
+
+    const stepX1 = (dt[3][0] - dt[0][0]) / 8;
+    const stepY1 = (dt[3][1] - dt[0][1]) / 8;
+    const stepX2 = (dt[2][0] - dt[1][0]) / 8;
+    const stepY2 = (dt[2][1] - dt[1][1]) / 8;
+
+    for (let index = 0; index <= 8; index += 1) {
+        const x1 = dt[0][0] + stepX1 * index;
+        const y1 = dt[0][1] + stepY1 * index;
+        drawCircle(x1, y1, 2, "#ffff00");
+
+        const x2 = dt[1][0] + stepX2 * index;
+        const y2 = dt[1][1] + stepY2 * index;
+        drawCircle(x2, y2, 2, "#ffff00");
+
+        drawLine(x1, y1, x2, y2, 1, "#ffff00");
+        pointsX1.push(x1);
+        pointsX1.push(x2);
+        pointsY1.push(y1);
+        pointsY1.push(y2);
+    }
+
+    const pointsX2 = [];
+    const pointsY2 = [];
+
+    const stepX3 = (dt[1][0] - dt[0][0]) / 8;
+    const stepY3 = (dt[1][1] - dt[0][1]) / 8;
+    const stepX4 = (dt[2][0] - dt[3][0]) / 8;
+    const stepY4 = (dt[2][1] - dt[3][1]) / 8;
+
+    for (let index = 0; index <= 8; index += 1) {
+        const x1 = dt[0][0] + stepX3 * index;
+        const y1 = dt[0][1] + stepY3 * index;
+        drawCircle(x1, y1, 2, "yellow");
+
+        const x2 = dt[3][0] + stepX4 * index;
+        const y2 = dt[3][1] + stepY4 * index;
+        drawCircle(x2, y2, 2, "yellow");
+
+        drawLine(x1, y1, x2, y2, 1, "yellow");
+        pointsX2.push(x1);
+        pointsX2.push(x2);
+        pointsY2.push(y1);
+        pointsY2.push(y2);
+    }
+
+    sgfSetup = "";
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split("");
+
+
+    for (let x = 0; x < pointsX1.length; x += 2) {
+        for (let y = 0; y < pointsY1.length; y += 2) {
+            const point = getIntersection(pointsX1[x], pointsY1[x], pointsX1[x + 1], pointsY1[x + 1],
+            pointsX2[y], pointsY2[y], pointsX2[y + 1], pointsY2[y + 1]);
+        
+            const color = getStoneColor(point.x, point.y);
+            if (color === "B") {
+                drawCircle(point.x, point.y, 3, "black");
+                sgfSetup += "AB[" + alphabet[x/2] + alphabet[y/2] + "]";
+            } else if (color === "W") {
+                drawCircle(point.x, point.y, 3, "white");
+                sgfSetup += "AW[" + alphabet[x/2] + alphabet[y/2] + "]";
+            } else {
+                drawCircle(point.x, point.y, 3, "yellow");
+            }
+        }
+    }
+
+}
+
+let sgfSetup = "";
+
+function chkxy(mx, my) {
+
+    for ( i = 0 ; i < dt.length ; i++ ) {
+        if ((dt[i][0] - 50 < mx && mx < dt[i][0] + 50) &&  (dt[i][1] - 50 < my && my < dt[i][1] + 50) ) { 
+            cur_tp = i;
+            dspp();
+            return true;
+        } else {
+            cur_tp = -1;
+        }
+    }
+
+    return false ; 
+}
+
+function drawCircle(x, y, r, c) {
+
+    x = parseInt(x) ;
+    y = parseInt(y) ;
+    r = parseInt(r) ;
+
+    ctx2.beginPath();
+
+    ctx2.fillStyle = c;
+    ctx2.arc(x ,y ,r ,0, 2 * Math.PI, false) ;
+    ctx2.fill();
+
+}
+
+function drawLine(x1,y1,x2,y2,w,c) {  //直線の描画
+    x1 = parseInt(x1) ;
+    y1 = parseInt(y1) ;
+    x2 = parseInt(x2) ;
+    y2 = parseInt(y2) ;
+    ctx2.globalAlpha = 1;
+    ctx2.beginPath();
+    ctx2.strokeStyle = c ;
+    ctx2.lineWidth = w ;
+    ctx2.moveTo( x1,y1 );
+    ctx2.lineTo( x2,y2 );
+    ctx2.stroke();
+    ctx2.closePath();
+}
 
 
 let imgScale = 1;
@@ -180,75 +351,118 @@ function update() {
     ctx1.scale(imgScale, imgScale);
     ctx1.drawImage(image, imgX, imgY);
     ctx1.restore();
-
-    drawGrid();
 }
 
+function getIntersection(xA, yA, xB, yB, xC, yC, xD, yD) {
+
+    let a1 = yA - yB,
+        a2 = yC - yD,
+        b1 = xB - xA,
+        b2 = xD - xC,
+        c1 = xA * (yB - yA) - yA * (xB - xA),
+        c2 = xC * (yD - yC) - yC * (xD - xC);
+
+    if (a1 * b2 == a2 * b1)
+        throw new Error("Invalid Coordinates");
+
+    let result = {};
+    result.x = (c2 * b1 - c1 * b2) / (a1 * b2 - a2 * b1);
+    result.y = (c2 * a1 - c1 * a2) / (b1 * a2 - b2 * a1);
+
+    return result;
+}
+
+// return "B" or "W" or ""
+function getStoneColor(x, y) {
+
+    const imagedata1 = ctx1.getImageData(x, y, 1, 1);
+    const r1 = imagedata1.data[0];
+    const g1 = imagedata1.data[1];
+    const b1 = imagedata1.data[2];
+
+    const imagedata2 = ctx1.getImageData(x + 2, y - 2, 1, 1);
+    const r2 = imagedata2.data[0];
+    const g2 = imagedata2.data[1];
+    const b2 = imagedata2.data[2];
+
+    const imagedata3 = ctx1.getImageData(x - 2, y + 2, 1, 1);
+    const r3 = imagedata3.data[0];
+    const g3 = imagedata3.data[1];
+    const b3 = imagedata3.data[2];
+
+    const isBlack = (r1 < 80 && g1 < 80 && b1 < 80) 
+        && (r2 < 80 && g2 < 80 && b2 < 80)
+        && (r3 < 80 && g3 < 80 && b3 < 80);
+
+    const isWhite = (r1 > 130 && g1 > 130 && b1 > 150) 
+        && (r2 > 130 && g2 > 130 && b2 > 150)
+        && (r3 > 130 && g3 > 130 && b3 > 150);
+
+    return isBlack ? "B" : (isWhite ? "W" : "");
+}
 
 document.getElementById("scan").addEventListener("click", e => {
-    // update();
 
-    const unitWidth = 300 / 8;
-    const unitHeight = 300 / 8;
+    // const unitWidth = 300 / 8;
+    // const unitHeight = 300 / 8;
 
-    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split("");
-    let hoge = "";
+    // const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split("");
+    // let hoge = "";
     let sgf = "(;FF[4]GM[1]SZ[9]";
     // let sgf = "(;";
-    let sgf_b = "";
-    let sgf_w = "";
 
-    let yy = 0;
-    for (y = 10; y <= 320; y += unitHeight) {
-        let row = "";
-        let xx = 0;
-        for (x = 10; x <= 320; x += unitWidth) {
+    // let yy = 0;
+    // for (y = 10; y <= 320; y += unitHeight) {
+    //     let row = "";
+    //     let xx = 0;
+    //     for (x = 10; x <= 320; x += unitWidth) {
 
-            const imagedata1 = ctx1.getImageData(x, y, 1, 1);
-            const r1 = imagedata1.data[0];
-            const g1 = imagedata1.data[1];
-            const b1 = imagedata1.data[2];
+    //         const imagedata1 = ctx1.getImageData(x, y, 1, 1);
+    //         const r1 = imagedata1.data[0];
+    //         const g1 = imagedata1.data[1];
+    //         const b1 = imagedata1.data[2];
 
-            const imagedata2 = ctx1.getImageData(x + 2, y - 2, 1, 1);
-            const r2 = imagedata2.data[0];
-            const g2 = imagedata2.data[1];
-            const b2 = imagedata2.data[2];
+    //         const imagedata2 = ctx1.getImageData(x + 2, y - 2, 1, 1);
+    //         const r2 = imagedata2.data[0];
+    //         const g2 = imagedata2.data[1];
+    //         const b2 = imagedata2.data[2];
 
-            const imagedata3 = ctx1.getImageData(x - 2, y + 2, 1, 1);
-            const r3 = imagedata3.data[0];
-            const g3 = imagedata3.data[1];
-            const b3 = imagedata3.data[2];
+    //         const imagedata3 = ctx1.getImageData(x - 2, y + 2, 1, 1);
+    //         const r3 = imagedata3.data[0];
+    //         const g3 = imagedata3.data[1];
+    //         const b3 = imagedata3.data[2];
 
-            const isBlack = (r1 < 80 && g1 < 80 && b1 < 80) 
-                && (r2 < 80 && g2 < 80 && b2 < 80)
-                && (r3 < 80 && g3 < 80 && b3 < 80);
+    //         const isBlack = (r1 < 80 && g1 < 80 && b1 < 80) 
+    //             && (r2 < 80 && g2 < 80 && b2 < 80)
+    //             && (r3 < 80 && g3 < 80 && b3 < 80);
 
-            const isWhite = (r1 > 130 && g1 > 130 && b1 > 150) 
-                && (r2 > 130 && g2 > 130 && b2 > 150)
-                && (r3 > 130 && g3 > 130 && b3 > 150);
+    //         const isWhite = (r1 > 130 && g1 > 130 && b1 > 150) 
+    //             && (r2 > 130 && g2 > 130 && b2 > 150)
+    //             && (r3 > 130 && g3 > 130 && b3 > 150);
 
-            if (isBlack) {
-                row += "●";
-                sgf_b += "[" + alphabet[xx] + alphabet[yy] + "]";
-            } else if (isWhite) {
-                row += "○";
-                sgf_w += "[" + alphabet[xx] + alphabet[yy] + "]";
-            } else {
-                row += "　";
-            }
+    //         if (isBlack) {
+    //             row += "●";
+    //             sgf += "AB[" + alphabet[xx] + alphabet[yy] + "]";
+    //         } else if (isWhite) {
+    //             row += "○";
+    //             sgf += "AW[" + alphabet[xx] + alphabet[yy] + "]";
+    //         } else {
+    //             row += "　";
+    //         }
 
-            xx += 1;
+    //         xx += 1;
             
-        }
+    //     }
 
-        yy += 1;
-        hoge += row + "\n";
-    }
-    sgf += "AB" + sgf_b + "AW" + sgf_w + ")";
+    //     yy += 1;
+    //     hoge += row + "\n";
+    // }
+    sgf += sgfSetup;
+    sgf += ")";
 
     document.getElementById("result").innerText = sgf;
 
-    drawGrid();
+    // drawGrid();
 
     gliftWidget = glift.create({
         sgf: {
@@ -272,101 +486,41 @@ image.addEventListener("load",function (){
     ctx1.drawImage(image, 0, 0);
     ctx1.restore();
 
-    drawGrid();
+    // drawGrid();
 });
 
 image.src = "goban.png";
 
-drawGrid();
+canvas2.addEventListener("click", e => {
+    const rect = e.target.getBoundingClientRect();
 
-function drawGrid() {
+        // ブラウザ上での座標を求める
+    const   viewX = e.clientX - rect.left,
+            viewY = e.clientY - rect.top;
 
-    ctx2.clearRect(0, 0, 1000, 1000);
+        // 表示サイズとキャンバスの実サイズの比率を求める
+    const   scaleWidth =  canvas2.clientWidth / canvas2.width,
+            scaleHeight =  canvas2.clientHeight / canvas2.height;
 
-    ctx2.lineWidth = 1.0;
-    ctx2.strokeStyle = "red";
-    ctx2.strokeRect(10, 10, 300, 300);
+        // ブラウザ上でのクリック座標をキャンバス上に変換
+    const   canvasX = Math.floor( viewX / scaleWidth ),
+            canvasY = Math.floor( viewY / scaleHeight );
 
-    const unitWidth = 300 / 8;
-    const unitHeight = 300 / 8;
-
-    for (y = 10; y <= 320; y += unitHeight) {
-
-        for (x = 10; x <= 320; x += unitWidth) {
-
-            const imagedata1 = ctx1.getImageData(x, y, 1, 1);
-            const r1 = imagedata1.data[0];
-            const g1 = imagedata1.data[1];
-            const b1 = imagedata1.data[2];
-
-            const imagedata2 = ctx1.getImageData(x + 2, y - 2, 1, 1);
-            const r2 = imagedata2.data[0];
-            const g2 = imagedata2.data[1];
-            const b2 = imagedata2.data[2];
-
-            const imagedata3 = ctx1.getImageData(x - 2, y + 2, 1, 1);
-            const r3 = imagedata3.data[0];
-            const g3 = imagedata3.data[1];
-            const b3 = imagedata3.data[2];
-
-            const isBlack = (r1 < 80 && g1 < 80 && b1 < 80) 
-                && (r2 < 80 && g2 < 80 && b2 < 80)
-                && (r3 < 80 && g3 < 80 && b3 < 80);
-
-            const isWhite = (r1 > 130 && g1 > 130 && b1 > 150) 
-                && (r2 > 130 && g2 > 130 && b2 > 150)
-                && (r3 > 130 && g3 > 130 && b3 > 150);
-
-            ctx2.beginPath();
-            if (isBlack) {
-                ctx2.fillStyle = 'yellow';
-                ctx2.arc(x, y, 5, 0, Math.PI * 2, true);
-            } else if (isWhite) {
-                ctx2.fillStyle = 'red';
-                ctx2.arc(x, y, 5, 0, Math.PI * 2, true);
-            } else {
-                ctx2.fillStyle = 'green';
-                ctx2.arc(x, y, 1, 0, Math.PI * 2, true);
-            }
-            ctx2.fill();
-
-
-        }
-
-    }
-
-}
-
-// canvas.addEventListener("click", e => {
-//     const rect = e.target.getBoundingClientRect();
-
-//         // ブラウザ上での座標を求める
-//     const   viewX = e.clientX - rect.left,
-//             viewY = e.clientY - rect.top;
-
-//         // 表示サイズとキャンバスの実サイズの比率を求める
-//     const   scaleWidth =  canvas.clientWidth / canvas.width,
-//             scaleHeight =  canvas.clientHeight / canvas.height;
-
-//         // ブラウザ上でのクリック座標をキャンバス上に変換
-//     const   canvasX = Math.floor( viewX / scaleWidth ),
-//             canvasY = Math.floor( viewY / scaleHeight );
-
-// 	const index = (canvasX * (canvasY - 1)) * 4;
+	const index = (canvasX * (canvasY - 1)) * 4;
 
   
-//     var imagedata = ctx.getImageData(canvasX, canvasY, 1, 1);
+    var imagedata = ctx2.getImageData(canvasX, canvasY, 1, 1);
 
-// // RGBAの取得。
-// var r = imagedata.data[0];
-// var g = imagedata.data[1];
-// var b = imagedata.data[2];
-// var a = imagedata.data[3];
+    // RGBAの取得。
+    var r = imagedata.data[0];
+    var g = imagedata.data[1];
+    var b = imagedata.data[2];
+    var a = imagedata.data[3];
 
-// console.log(r, g, b);
+    console.log(r, g, b, a);
 
     
-// });
+});
 
 
 
