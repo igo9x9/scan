@@ -28,6 +28,28 @@
 <div style="text-align: center;font-size: 1.5rem;padding: 20px;">碁盤を読み取る実験</div>
 
 <div style="text-align:center;margin-bottom:20px;">
+    <form class="pure-form" style="width: 320px;margin-left:auto;margin-right:auto;">
+        <div class="pure-g">
+            <div class="pure-u-1-3">
+                <label for="radio-9" class="pure-radio">
+                    <input type="radio" id="radio-9" name="ban-size" value="9" checked="" /> 9路
+                </label>
+            </div>
+            <div class="pure-u-1-3">
+                <label for="radio-13" class="pure-radio">
+                    <input type="radio" id="radio-13" name="ban-size" value="13" /> 13路
+                </label>
+            </div>
+            <div class="pure-u-1-3">
+                <label for="radio-19" class="pure-radio">
+                    <input type="radio" id="radio-19" name="ban-size" value="19" /> 19路
+                </label>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div style="text-align:center;margin-bottom:20px;">
     <input type="file" id="file">
 </div>
 
@@ -81,7 +103,15 @@
 
 <script>
 
-const gobanSize = 19;
+let radio_btns = document.querySelectorAll(`input[type='radio'][name='ban-size']`);
+
+for (let target of radio_btns) {
+	target.addEventListener(`change`, function () {
+        gobanSize = target.value;
+    });
+}
+
+let gobanSize = 9;
 
 const canvas1 = document.getElementById('canvas1');
 const ctx1 = canvas1.getContext('2d');
@@ -462,31 +492,38 @@ function getStoneColor(x, y) {
     const g = imagedata.data[1];
     const b = imagedata.data[2];
 
-    const imagedata1 = ctx1.getImageData(x + 2, y + 2, 1, 1);
+    const imagedata1 = ctx1.getImageData(x + 3, y + 3, 1, 1);
     const r1 = imagedata1.data[0];
     const g1 = imagedata1.data[1];
     const b1 = imagedata1.data[2];
 
-    const imagedata2 = ctx1.getImageData(x + 2, y - 2, 1, 1);
+    const imagedata2 = ctx1.getImageData(x + 3, y - 3, 1, 1);
     const r2 = imagedata2.data[0];
     const g2 = imagedata2.data[1];
     const b2 = imagedata2.data[2];
 
-    const imagedata3 = ctx1.getImageData(x - 2, y + 2, 1, 1);
+    const imagedata3 = ctx1.getImageData(x - 3, y + 3, 1, 1);
     const r3 = imagedata3.data[0];
     const g3 = imagedata3.data[1];
     const b3 = imagedata3.data[2];
 
-    const imagedata4 = ctx1.getImageData(x - 2, y - 2, 1, 1);
+    const imagedata4 = ctx1.getImageData(x - 3, y - 3, 1, 1);
     const r4 = imagedata4.data[0];
     const g4 = imagedata4.data[1];
     const b4 = imagedata4.data[2];
 
-    const isBlack = (r < blackMax && g < blackMax && b < blackMax)
+    let isBlack = (r < blackMax && g < blackMax && b < blackMax)
         && ((r1 < blackMax && g1 < blackMax && b1 < blackMax) || (r2 < blackMax && g2 < blackMax && b2 < blackMax) || (r3 < blackMax && g3 < blackMax && b3 < blackMax) || (r4 < blackMax && g4 < blackMax && b4 < blackMax));
 
-    const isWhite = (r > whiteMin && g > whiteMin && b > whiteMin)
+    let isWhite = (r > whiteMin && g > whiteMin && b > whiteMin)
         && ((r1 > whiteMin && g1 > whiteMin && b1 > whiteMin) || (r2 > whiteMin && g2 > whiteMin && b2 > whiteMin) || (r3 > whiteMin && g3 > whiteMin && b3 > whiteMin) || (r4 > whiteMin && g4 > whiteMin && b4 > whiteMin));
+
+    if (isBlack && b < r && b < g) {
+        isBlack = false;
+    }
+    if (isWhite && b < r && b < g) {
+        isWhite = false;
+    }
 
     return isBlack ? "B" : (isWhite ? "W" : "");
 }
@@ -606,7 +643,7 @@ canvas2.addEventListener("click", e => {
 	const index = (canvasX * (canvasY - 1)) * 4;
 
   
-    var imagedata = ctx2.getImageData(canvasX, canvasY, 1, 1);
+    var imagedata = ctx1.getImageData(canvasX, canvasY, 1, 1);
 
     // RGBAの取得。
     var r = imagedata.data[0];
