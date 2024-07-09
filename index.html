@@ -97,8 +97,8 @@ canvas2.addEventListener("mousedown", function(e) {
 canvas2.addEventListener("touchmove", function(e) {
     setxy(e, 1) ;
     if (cur_tp !=- 1) {
-        dt[cur_tp][0] = curx;
-        dt[cur_tp][1] = cury;
+        dt[cur_tp][0] = curx + sabunX;
+        dt[cur_tp][1] = cury + sabunY;
         drawGrid();
     }
 }, true);
