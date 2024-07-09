@@ -518,10 +518,10 @@ function getStoneColor(x, y) {
     let isWhite = (r > whiteMin && g > whiteMin && b > whiteMin)
         && ((r1 > whiteMin && g1 > whiteMin && b1 > whiteMin) || (r2 > whiteMin && g2 > whiteMin && b2 > whiteMin) || (r3 > whiteMin && g3 > whiteMin && b3 > whiteMin) || (r4 > whiteMin && g4 > whiteMin && b4 > whiteMin));
 
-    if (isBlack && b < r && b < g) {
+    if (isBlack && b < r - 20 && b < g - 20) {
         isBlack = false;
     }
-    if (isWhite && b < r && b < g) {
+    if (isWhite && b < r -20 && b < g - 20) {
         isWhite = false;
     }
 
