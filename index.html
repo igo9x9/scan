@@ -30,24 +30,24 @@
 </div>
 
 <div style="text-align:center; margin-top: 20px;">
-    <button id="up">上</button>
+    <button id="up" style="width:50px;height:50px;">上</button>
 </div>
 <div style="text-align:center; margin-top: 10px;">
-    <button id="left" style="margin-right: 10px;">左</button>
-    <button id="right" style="margin-left: 10px;">右</button>
+    <button id="left" style="margin-right: 10px;width:50px;height:50px;">左</button>
+    <button id="right" style="margin-left: 10px;width:50px;height:50px;">右</button>
 </div>
 <div style="text-align:center; margin-top: 10px;">
-    <button id="down">下</button>
+    <button id="down" style="width:50px;height:50px;">下</button>
 </div>
 
 <div style="text-align:center; margin-top: 20px;">
-    <button id="zoomin">拡大</button>
-    <button id="zoomout">縮小</button>
+    <button id="zoomin" style="width:50px;height:50px;">拡大</button>
+    <button id="zoomout" style="width:50px;height:50px;">縮小</button>
 </div>
 
 
 <div style="text-align:center; margin-top: 20px;">
-    <button id="scan">スキャン</button>
+    <button id="scan" style="width:100px;height:50px;">スキャン</button>
 </div>
 
 <div style="text-align:center; margin-top: 20px;">
@@ -73,46 +73,53 @@ const image = new Image();
 let cur_tp = -1;
 let drawFlag = false;
 let curx, cury;
+let sabunX, sabunY;
 
 canvas2.addEventListener("mousemove", function(e) {
     setxy(e, 0);
 
     if ( cur_tp !=- 1 ) {
-        dt[cur_tp][0] = curx;
-        dt[cur_tp][1] = cury;
-        dspp();
+        dt[cur_tp][0] = curx + sabunX;
+        dt[cur_tp][1] = cury + sabunY;
+        drawGrid();
     }
 }, true);
 
 canvas2.addEventListener("mousedown", function(e) {
     drawFlag = true;
     setxy(e, 0);
-    chkxy(curx, cury);
+    checkStartPoint(curx, cury);
+    if (cur_tp != -1) {
+        drawGrid();
+    }
 }, true);
 
 canvas2.addEventListener("touchmove", function(e) {
     setxy(e, 1) ;
-    if ( cur_tp !=- 1 ) {
+    if (cur_tp !=- 1) {
         dt[cur_tp][0] = curx;
         dt[cur_tp][1] = cury;
-        dspp();
+        drawGrid();
     }
 }, true);
 
 canvas2.addEventListener("touchstart", function(e) {
     drawFlag = true;
     setxy(e, 1) ;
-    chkxy(curx, cury) ;
+    checkStartPoint(curx, cury) ;
+    if (cur_tp != -1) {
+        drawGrid();
+    }
 }, true);
 
 canvas2.addEventListener("touchend", function(e) {
-    dspp();
+    drawGrid();
     drawFlag = false;
     cur_tp = -1;
 }, true);
 
 canvas2.addEventListener("mouseup", function(e) {
-    dspp();
+    drawGrid();
     drawFlag = false;
     cur_tp = -1;
 }, true);
@@ -138,7 +145,7 @@ function setxy(e, f) {
 
 }
 
-function dspp() {
+function drawGrid() {
 
     ctx2.clearRect(0, 0, 1000, 1000);
 
@@ -274,12 +281,13 @@ function trans3D(index, y1, y2) {
 
 let sgfSetup = "";
 
-function chkxy(mx, my) {
+function checkStartPoint(mx, my) {
 
     for ( i = 0 ; i < dt.length ; i++ ) {
-        if ((dt[i][0] - 30 < mx && mx < dt[i][0] + 30) &&  (dt[i][1] - 30 < my && my < dt[i][1] + 30) ) { 
+        if ((dt[i][0] - 100 < mx && mx < dt[i][0] + 100) &&  (dt[i][1] - 100 < my && my < dt[i][1] + 100) ) { 
             cur_tp = i;
-            dspp();
+            sabunX = dt[i][0] - mx;
+            sabunY = dt[i][1] - my;
             return true;
         } else {
             cur_tp = -1;
