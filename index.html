@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <script src="glift_1_1_2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css">
+    <script src="https://misohena.github.io/js_igo/igo.js?ver=20200514"></script>
+    <script src="https://misohena.github.io/js_igo/igo_view.js?ver=20200514"></script>
     <style>
         .canvas-wrapper {
             position: relative;
@@ -14,48 +16,67 @@
             top: 0;
             left: 0;
         }
+        .button-success {
+            background: rgb(28, 184, 65);
+            color: white;
+            border-radius: 4px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);            
+        }
     </style>
 </head>
+
+<div style="text-align: center;font-size: 1.5rem;padding: 20px;">碁盤を読み取る実験</div>
+
+<div style="text-align:center;margin-bottom:20px;">
+    <input type="file" id="file">
+</div>
 
 <div style="text-align:center">
     <canvas id="canvas1" width="320" height="320" style="border: 1px solid #000"></canvas>
 </div>
 
-<div style="text-align:center;margin-top: -328.667px;">
+<div style="text-align:center;margin-top: -327px;">
     <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
 </div>
 
-<div style="text-align:center">
-    <input type="file" id="file">
+<div>
+    <div class="pure-g" style="width: 320px;margin-left:auto;margin-right: auto;margin-top: 40px;">
+        <div class="pure-u-1-2">
+            <div style="text-align:center;">
+                <button id="up" class="pure-button pure-button-primary">上</button>
+            </div>
+            <div style="text-align:center; margin-top: 20px;">
+                <button id="left" class="pure-button pure-button-primary" style="margin-right: 20px;">左</button>
+                <button id="right" class="pure-button pure-button-primary" style="margin-left: 20px;">右</button>
+            </div>
+            <div style="text-align:center; margin-top: 20px;">
+                <button id="down" class="pure-button pure-button-primary">下</button>
+            </div>
+        </div>
+        <div class="pure-u-1-2">
+            <div style="text-align:center; margin-top: 30px;">
+                <button id="zoomin" class="pure-button pure-button-primary">拡大</button>
+                <br>
+                <button id="zoomout" class="pure-button pure-button-primary" style="margin-top:20px;">縮小</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div style="text-align:center; margin-top: 40px;">
+    <button id="scan" class="button-success pure-button">スキャン</button>
 </div>
 
 <div style="text-align:center; margin-top: 20px;">
-    <button id="up" style="width:50px;height:50px;">上</button>
-</div>
-<div style="text-align:center; margin-top: 10px;">
-    <button id="left" style="margin-right: 10px;width:50px;height:50px;">左</button>
-    <button id="right" style="margin-left: 10px;width:50px;height:50px;">右</button>
-</div>
-<div style="text-align:center; margin-top: 10px;">
-    <button id="down" style="width:50px;height:50px;">下</button>
+
+    <div id="js-igo"></div>
+    <textarea id="result" style="width:100%;" rows="5"></textarea>
+    
 </div>
 
-<div style="text-align:center; margin-top: 20px;">
-    <button id="zoomin" style="width:50px;height:50px;">拡大</button>
-    <button id="zoomout" style="width:50px;height:50px;">縮小</button>
-</div>
-
-
-<div style="text-align:center; margin-top: 20px;">
-    <button id="scan" style="width:100px;height:50px;">スキャン</button>
-</div>
-
-<div style="text-align:center; margin-top: 20px;">
-
-    <div id="test" style="width: 320px; height: 320px"></div>
-
-    <textarea id="result" style="width:320px;" rows="5"></textarea>
-</div>
 
 
 <script>
@@ -533,13 +554,20 @@ document.getElementById("scan").addEventListener("click", e => {
 
     // drawGrid();
 
-    gliftWidget = glift.create({
-        sgf: {
-            sgfString: sgf,
-            widgetType: 'EXAMPLE',
-        },
-        divId: "test"
-    });
+    const parent = document.getElementById("js-igo");
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+    const gameView = new igo.GameView(
+        "js-igo",
+        sgf,
+        {
+            ui:{bottom: ["UndoRedo"]},
+            showMoveNumber: true,
+        }
+    );    
+    gameView.fitBoardSizeToWindowAndParent();
+
 });
 
 
