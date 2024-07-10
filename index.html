@@ -103,18 +103,29 @@
     
 </div>
 
-<a href="https://fujigoban.appspot.com/ai/">AIを使う</a>
+<div style="text-align:center; margin-top: 5px;">
+    <button id="copy" class="pure-button-primary pure-button">クリップボードにコピー</button>
+</div>
+
+<div style="text-align:center; margin-top: 5px;">
+    <a id="fujigoban" href="https://fujigoban.appspot.com/ai/" class="button-success pure-button">AIの評価を見る（藤碁盤様）</a>
+</div>
 
 <script>
 
 let radio_btns = document.querySelectorAll(`input[type='radio'][name='ban-size']`);
 
 for (let target of radio_btns) {
-	target.addEventListener(`change`, function () {
+	target.addEventListener("change", function () {
         gobanSize = Number(target.value);
         drawGrid();
     });
 }
+
+document.getElementById("copy").addEventListener("click", function() {
+    navigator.clipboard.writeText(sgf);
+    alert("クリップボードにコピーしました。");
+});
 
 let gobanSize = 9;
 
@@ -535,9 +546,11 @@ function getStoneColor(x, y) {
     return isBlack ? "B" : (isWhite ? "W" : "");
 }
 
+let sgf;
+
 document.getElementById("scan").addEventListener("click", e => {
 
-    let sgf = "(;FF[4]GM[1]SZ[" + gobanSize + "]";
+    sgf = "(;FF[4]GM[1]SZ[" + gobanSize + "]";
 
     sgf += sgfSetup;
     sgf += ")";
@@ -553,15 +566,16 @@ document.getElementById("scan").addEventListener("click", e => {
         "js-igo",
         sgf,
         {
-            ui:{bottom: ["UndoRedo"]},
+            // ui:{bottom: ["UndoRedo"]},
+            ui: {},
             editable: false,
         }
     );    
     gameView.fitBoardSizeToWindowAndParent();
 
+    document.getElementById("fujigoban").href = "https://fujigoban.appspot.com/ai/?sgf=" + sgf;
+
 });
-
-
 
 image.addEventListener("load",function (){
     // canvas.width = image.naturalWidth;
