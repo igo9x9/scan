@@ -25,7 +25,7 @@
     </style>
 </head>
 
-<div style="text-align: center;font-size: 1.5rem;padding: 20px;">碁盤を読み取る実験</div>
+<div style="text-align: center;font-size: 1.3rem;padding: 20px;">碁盤画像を読み取る実験</div>
 
 <div style="text-align:center;margin-bottom:20px;">
     <form class="pure-form" style="width: 320px;margin-left:auto;margin-right:auto;">
@@ -95,11 +95,15 @@
 <div style="text-align:center; margin-top: 20px;">
 
     <div id="js-igo"></div>
+
+    <div style="text-align:center; margin-top: 10px;">
+        SGFデータ
+    </div>
     <textarea id="result" style="width:100%;" rows="5"></textarea>
     
 </div>
 
-
+<a href="https://fujigoban.appspot.com/ai/">AIを使う</a>
 
 <script>
 
@@ -550,7 +554,7 @@ document.getElementById("scan").addEventListener("click", e => {
         sgf,
         {
             ui:{bottom: ["UndoRedo"]},
-            showMoveNumber: true,
+            editable: false,
         }
     );    
     gameView.fitBoardSizeToWindowAndParent();
@@ -575,7 +579,7 @@ image.addEventListener("load",function (){
     drawGrid();
 });
 
-image.src = "goban.png";
+image.src = "19x19.jpg";
 
 canvas2.addEventListener("click", e => {
     const rect = e.target.getBoundingClientRect();
