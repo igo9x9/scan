@@ -27,12 +27,12 @@
 
 <div style="text-align: center;font-size: 1.3rem;padding: 20px;">碁盤画像を読み取る実験</div>
 
-<div style="text-align:center;margin-bottom:20px;">
+<div style="text-align:center;margin-bottom:20px;display:none;">
     <form class="pure-form" style="width: 320px;margin-left:auto;margin-right:auto;">
         <div class="pure-g">
             <div class="pure-u-1-3">
                 <label for="radio-9" class="pure-radio">
-                    <input type="radio" id="radio-9" name="ban-size" value="9" checked="" /> 9路
+                    <input type="radio" id="radio-9" name="ban-size" value="9"  /> 9路
                 </label>
             </div>
             <div class="pure-u-1-3">
@@ -42,7 +42,7 @@
             </div>
             <div class="pure-u-1-3">
                 <label for="radio-19" class="pure-radio">
-                    <input type="radio" id="radio-19" name="ban-size" value="19" /> 19路
+                    <input type="radio" id="radio-19" name="ban-size" value="19" checked/> 19路
                 </label>
             </div>
         </div>
@@ -61,7 +61,7 @@
     <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
 </div>
 
-<div>
+<div style="display: none;">
     <div class="pure-g" style="width: 320px;margin-left:auto;margin-right: auto;margin-top: 40px;">
         <div class="pure-u-1-2">
             <div style="text-align:center;">
@@ -127,7 +127,7 @@ document.getElementById("copy").addEventListener("click", function() {
     alert("クリップボードにコピーしました。");
 });
 
-let gobanSize = 9;
+let gobanSize = 19;
 
 const canvas1 = document.getElementById('canvas1');
 const ctx1 = canvas1.getContext('2d');
@@ -143,13 +143,21 @@ let curx, cury;
 let sabunX, sabunY;
 
 canvas2.addEventListener("mousemove", function(e) {
+
+    if (!drawFlag) return;
+
     setxy(e, 0);
 
     if ( cur_tp !=- 1 ) {
         dt[cur_tp][0] = curx + sabunX;
         dt[cur_tp][1] = cury + sabunY;
         drawGrid();
+    } else {
+        imgX = curx + sabunX;
+        imgY = cury + sabunY;
+        update();
     }
+
 }, true);
 
 canvas2.addEventListener("mousedown", function(e) {
@@ -161,23 +169,66 @@ canvas2.addEventListener("mousedown", function(e) {
     }
 }, true);
 
+canvas2.addEventListener("mousewheel", function(e) {
+    e.preventDefault();
+    if (e.wheelDelta > 0) {
+        imgScale += 0.001;
+        update();
+    } else {
+        imgScale -= 0.001;
+        update();
+    }
+}, true);
+
 canvas2.addEventListener("touchmove", function(e) {
+
+    if (!drawFlag) return;
+
     setxy(e, 1) ;
-    if (cur_tp !=- 1) {
+
+    if (event.touches.length === 2) {
+        let distance = getDistance(event.touches[0], event.touches[1]);
+        // imgScale = scaleAtTouchStart * (distance / distanceWhenTouched);
+        if (distance > distanceWhenTouched) {
+            imgScale += 0.0001;
+        } else if (distance < distanceWhenTouched) {
+            imgScale -= 0.0001;
+        }
+        update();
+    } else if (cur_tp !=- 1) {
         dt[cur_tp][0] = curx + sabunX;
         dt[cur_tp][1] = cury + sabunY;
         drawGrid();
+    } else {
+        imgX = curx + sabunX;
+        imgY = cury + sabunY;
+        update();
     }
+
 }, true);
+
+let scaleAtTouchStart;
+let distanceWhenTouched;
 
 canvas2.addEventListener("touchstart", function(e) {
     drawFlag = true;
     setxy(e, 1) ;
     checkStartPoint(curx, cury) ;
-    if (cur_tp != -1) {
+
+    if (e.touches.length === 2) {
+        distanceWhenTouched = getDistance(e.touches[0], e.touches[1]);
+        scaleAtTouchStart = imgScale;
+    } else if (cur_tp != -1) {
         drawGrid();
     }
 }, true);
+
+// 2点間の距離を計算する関数
+function getDistance(touch1, touch2) {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
 
 canvas2.addEventListener("touchend", function(e) {
     drawGrid();
@@ -352,12 +403,14 @@ let sgfSetup = "";
 function checkStartPoint(mx, my) {
 
     for ( i = 0 ; i < dt.length ; i++ ) {
-        if ((dt[i][0] - 100 < mx && mx < dt[i][0] + 100) &&  (dt[i][1] - 100 < my && my < dt[i][1] + 100) ) { 
+        if ((dt[i][0] - 80 < mx && mx < dt[i][0] + 80) &&  (dt[i][1] - 80 < my && my < dt[i][1] + 80) ) { 
             cur_tp = i;
             sabunX = dt[i][0] - mx;
             sabunY = dt[i][1] - my;
             return true;
         } else {
+            sabunX = imgX - mx;
+            sabunY = imgY - my;
             cur_tp = -1;
         }
     }
