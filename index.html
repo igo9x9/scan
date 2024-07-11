@@ -12,6 +12,7 @@
     <meta property="og:description" content="碁盤画像からSGF形式のデータを作るためのツール" />
     <meta property="og:image" content="https://igo9x9.github.io/scan/img/twitter.png" />
     <title>碁盤画像認識</title>
+    <link rel="icon" href="favicon.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css">
     <script src="https://misohena.github.io/js_igo/igo.js?ver=20200514"></script>
     <script src="https://misohena.github.io/js_igo/igo_view.js?ver=20200514"></script>
@@ -36,17 +37,25 @@
         .hide {
             display: none;
         }
+        .text-shadow {
+            text-shadow:
+            1px 1px 0px #000, -1px -1px 0px #000,
+            -1px 1px 0px #000,  1px -1px 0px #000,
+            1px 0px 0px #000, -1px  0px 0px #000,
+            0px 1px 0px #000,  0px -1px 0px #000;
+        }
     </style>
 </head>
 
 <div style="max-width: 330px;margin-left:auto;margin-right:auto;">
-    <div style="text-align: center;font-size: 1.3rem;padding-top: 20px;">碁盤画像からSGFデータを作る</div>
+    <div style="text-align: center;font-size: 0.8rem;padding-top: 20px;padding-bottom: 2px;">碁盤画像からSGFデータを作る</div>
+    <div style="text-align: center;font-size: 1.3rem;">碁盤画像認識</div>
 
     <p>
-        これは、本物の碁盤の写真、囲碁ソフトのスクショなどから、SGF形式のデータを作るためのツールです。
+        本物の碁盤の写真、囲碁ソフトのスクショなどから、SGF形式のデータを作るためのツールです。
     </p>
     <p>
-        碁盤の画像を選択した後、格子状のグリッドが碁盤の目にピッタリ合うように、四隅の赤い丸を動かして調節してください。認識に成功した碁石には黄色の点が付きますので、すべての碁石が認識されるまで調整します。最後にスキャンボタンを押して完了です。
+        碁盤の画像を選択した後、格子状のグリッドが碁盤の目にピッタリ合うように、四隅の赤い丸<span style="color:red" class="text-shadow">●</span>を動かして調節してください。認識に成功した碁石には黄色の点<span style="color:yellow" class="text-shadow">●</span>が付きますので、すべての碁石が認識されるまで調整します。最後にスキャンボタンを押して完了です。
     </p>
     <p>
         ただ、本物の碁盤の写真を使用する場合、真正面から撮影していること、盤面に光の反射が無いこと、などの条件を満たしていないと、なかなか上手に認識できません…。
@@ -85,6 +94,10 @@
         <a id="fujigoban" href="https://fujigoban.appspot.com/ai/" class="pure-button-primary pure-button" target="_blank">AIの評価を見る（藤碁盤様のHPへ）</a>
     </div>
     
+    <div style="text-align:center; margin-top: 40px;margin-bottom: 20px;font-size: 0.8rem;">
+        ando19721226@gmail.com
+    </div>
+
 </div>
 
 
@@ -537,6 +550,7 @@ document.getElementById("scan").addEventListener("click", e => {
     document.getElementById("copy-wrapper").classList.remove("hide");
     document.getElementById("fujigoban-wrapper").classList.remove("hide");
 
+    window.scroll(0, document.documentElement.scrollHeight - document.documentElement.clientHeight);
 });
 
 image.addEventListener("load",function (){
