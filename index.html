@@ -10,7 +10,7 @@
     <meta property="og:url" content="https://igo9x9.github.io/scan/" />
     <meta property="og:title" content="碁盤画像認識" />
     <meta property="og:description" content="碁盤画像からSGF形式のデータを作るためのツール" />
-    <meta property="og:image" content="https://igo9x9.github.io/scan/twitter.png" />
+    <meta property="og:image" content="https://igo9x9.github.io/scan/twitterimg.png" />
     <title>碁盤画像認識</title>
     <link rel="icon" href="favicon.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css">
@@ -545,8 +545,7 @@ document.getElementById("scan").addEventListener("click", e => {
     );    
     gameView.fitBoardSizeToWindowAndParent();
 
-    document.getElementById("fujigoban").href = "https://fujigoban.appspot.com/ai/?sgf=" + sgf;
-
+    document.getElementById("fujigoban").href = "https://fujigoban.appspot.com/ai/?sgf=" + gameView.model.toSGF();
     document.getElementById("copy-wrapper").classList.remove("hide");
     document.getElementById("fujigoban-wrapper").classList.remove("hide");
 
