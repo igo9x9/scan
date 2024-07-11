@@ -104,7 +104,7 @@
 <script>
 
 document.getElementById("copy").addEventListener("click", function() {
-    navigator.clipboard.writeText(sgf);
+    navigator.clipboard.writeText(jsIgoGameView.model.toSGF());
     alert("SGF形式のデータをクリップボードにコピーしました。\n別の囲碁ソフトに貼り付けて使えます。");
 });
 
@@ -534,7 +534,7 @@ document.getElementById("scan").addEventListener("click", e => {
         parent.removeChild(parent.firstChild);
     }
 
-    const gameView = new igo.GameView(
+    jsIgoGameView = new igo.GameView(
         "js-igo",
         sgf,
         {
@@ -543,14 +543,16 @@ document.getElementById("scan").addEventListener("click", e => {
             editable: false,
         }
     );    
-    gameView.fitBoardSizeToWindowAndParent();
+    jsIgoGameView.fitBoardSizeToWindowAndParent();
 
-    document.getElementById("fujigoban").href = "https://fujigoban.appspot.com/ai/?sgf=" + gameView.model.toSGF();
+    document.getElementById("fujigoban").href = "https://fujigoban.appspot.com/ai/?sgf=" + jsIgoGameView.model.toSGF();
     document.getElementById("copy-wrapper").classList.remove("hide");
     document.getElementById("fujigoban-wrapper").classList.remove("hide");
 
     window.scroll(0, document.documentElement.scrollHeight - document.documentElement.clientHeight);
 });
+
+let jsIgoGameView;
 
 image.addEventListener("load",function (){
     // canvas.width = image.naturalWidth;
@@ -603,4 +605,3 @@ canvas2.addEventListener("click", e => {
 </script>
 
 </html>
-
