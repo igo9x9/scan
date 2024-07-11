@@ -19,112 +19,72 @@
         .button-success {
             background: rgb(28, 184, 65);
             color: white;
+        }
+        .pure-button {
             border-radius: 4px;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);            
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+        .hide {
+            display: none;
         }
     </style>
 </head>
 
-<div style="text-align: center;font-size: 1.3rem;padding: 20px;">碁盤画像を読み取る実験</div>
+<div style="max-width: 330px;margin-left:auto;margin-right:auto;">
+    <div style="text-align: center;font-size: 1.3rem;padding: 20px;">碁盤画像からSGFデータを作る</div>
 
-<div style="text-align:center;margin-bottom:20px;display:none;">
-    <form class="pure-form" style="width: 320px;margin-left:auto;margin-right:auto;">
-        <div class="pure-g">
-            <div class="pure-u-1-3">
-                <label for="radio-9" class="pure-radio">
-                    <input type="radio" id="radio-9" name="ban-size" value="9"  /> 9路
-                </label>
-            </div>
-            <div class="pure-u-1-3">
-                <label for="radio-13" class="pure-radio">
-                    <input type="radio" id="radio-13" name="ban-size" value="13" /> 13路
-                </label>
-            </div>
-            <div class="pure-u-1-3">
-                <label for="radio-19" class="pure-radio">
-                    <input type="radio" id="radio-19" name="ban-size" value="19" checked/> 19路
-                </label>
-            </div>
-        </div>
-    </form>
-</div>
+    <p>
+        これは、本物の碁盤の写真や囲碁ソフトのスクショから、SGF形式のデータを作るためのツールです。
+    </p>
+    <p>
+        碁盤の画像を選択した後、格子状のグリッドが碁盤の目にピッタリ合うように、四隅の赤い丸を動かして調節します。認識に成功した碁石には黄色の点が付きますので、すべての碁石が認識されるまで調整します。最後にスキャンボタンを押して完了です。
+    </p>
+    <p>
+        本物の碁盤の写真を使用する場合、真正面から撮影していること、盤面に光の反射が無いこと、などの条件を満たしていないと、なかなか上手に認識できません…。
+    </p>
+    
+    <hr style="margin-top:20px;margin-bottom: 20px;">
 
-<div style="text-align:center;margin-bottom:20px;">
-    <input type="file" id="file">
-</div>
-
-<div style="text-align:center">
-    <canvas id="canvas1" width="320" height="320" style="border: 1px solid #000"></canvas>
-</div>
-
-<div style="text-align:center;margin-top: -327px;">
-    <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
-</div>
-
-<div style="display: none;">
-    <div class="pure-g" style="width: 320px;margin-left:auto;margin-right: auto;margin-top: 40px;">
-        <div class="pure-u-1-2">
-            <div style="text-align:center;">
-                <button id="up" class="pure-button pure-button-primary">上</button>
-            </div>
-            <div style="text-align:center; margin-top: 20px;">
-                <button id="left" class="pure-button pure-button-primary" style="margin-right: 20px;">左</button>
-                <button id="right" class="pure-button pure-button-primary" style="margin-left: 20px;">右</button>
-            </div>
-            <div style="text-align:center; margin-top: 20px;">
-                <button id="down" class="pure-button pure-button-primary">下</button>
-            </div>
-        </div>
-        <div class="pure-u-1-2">
-            <div style="text-align:center; margin-top: 30px;">
-                <button id="zoomin" class="pure-button pure-button-primary">拡大</button>
-                <br>
-                <button id="zoomout" class="pure-button pure-button-primary" style="margin-top:20px;">縮小</button>
-            </div>
-        </div>
+    <div style="text-align:center;margin-bottom:20px;">
+        <input type="file" id="file">
     </div>
-</div>
-
-
-
-
-<div style="text-align:center; margin-top: 40px;">
-    <button id="scan" class="button-success pure-button">スキャン</button>
-</div>
-
-<div style="text-align:center; margin-top: 20px;">
-
-    <div id="js-igo"></div>
-
-    <div style="text-align:center; margin-top: 10px;">
-        SGFデータ
+    
+    <div style="text-align:center">
+        <canvas id="canvas1" width="320" height="320" style="border: 1px solid #000"></canvas>
     </div>
-    <textarea id="result" style="width:100%;" rows="5"></textarea>
+    
+    <div style="text-align:center;margin-top: -327px;">
+        <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
+    </div>
+    
+    
+    <div style="text-align:center; margin-top: 20px;">
+        <button id="scan" class="button-success pure-button">スキャン</button>
+    </div>
+    
+    <div style="text-align:center; margin-top: 20px;">
+    
+        <div id="js-igo"></div>
+    
+    </div>
+    
+    <div style="text-align:center; margin-top: 20px;" class="hide" id="copy-wrapper">
+        <button id="copy" class="pure-button-primary pure-button">SGF形式をクリップボードにコピー</button>
+    </div>
+    
+    <div style="text-align:center; margin-top: 20px;margin-bottom: 50px;" class="hide" id="fujigoban-wrapper">
+        <a id="fujigoban" href="https://fujigoban.appspot.com/ai/" class="pure-button-primary pure-button" target="_blank">AIの評価を見る（藤碁盤様のHPへ）</a>
+    </div>
     
 </div>
 
-<div style="text-align:center; margin-top: 5px;">
-    <button id="copy" class="pure-button-primary pure-button">クリップボードにコピー</button>
-</div>
-
-<div style="text-align:center; margin-top: 5px;">
-    <a id="fujigoban" href="https://fujigoban.appspot.com/ai/" class="button-success pure-button">AIの評価を見る（藤碁盤様）</a>
-</div>
 
 <script>
 
-let radio_btns = document.querySelectorAll(`input[type='radio'][name='ban-size']`);
-
-for (let target of radio_btns) {
-	target.addEventListener("change", function () {
-        gobanSize = Number(target.value);
-        drawGrid();
-    });
-}
-
 document.getElementById("copy").addEventListener("click", function() {
     navigator.clipboard.writeText(sgf);
-    alert("クリップボードにコピーしました。");
+    alert("SGF形式のデータをクリップボードにコピーしました。\n別の囲碁ソフトに貼り付けて使えます。");
 });
 
 let gobanSize = 19;
@@ -451,79 +411,6 @@ function drawLine(x1,y1,x2,y2,w,c) {  //直線の描画
 let imgScale = 1;
 let imgX = 0, imgY = 0;
 
-document.getElementById("file").addEventListener("change", e => {
-
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-
-    if (file) {
-        reader.onload = () => {
-            image.src = reader.result;
-        }
-    }
-})
-
-document.getElementById("zoomin").addEventListener("pointerdown", e => {
-    const intervalId = setInterval(() => {
-        imgScale += 0.001;
-        update();
-    }, 50);
-    document.addEventListener('pointerup', () => {        
-        clearInterval(intervalId)
-    }, { once: true })  
-});
-
-document.getElementById("zoomout").addEventListener("pointerdown", e => {
-    const intervalId = setInterval(() => {
-        imgScale -= 0.001;
-        update();
-    }, 50);
-    document.addEventListener('pointerup', () => {        
-        clearInterval(intervalId)
-    }, { once: true })  
-});
-
-document.getElementById("up").addEventListener("pointerdown", e => {
-    const intervalId = setInterval(() => {
-        imgY -= 5;
-        update();
-    }, 50);
-    document.addEventListener('pointerup', () => {        
-        clearInterval(intervalId)
-    }, { once: true })  
-});
-
-document.getElementById("down").addEventListener("pointerdown", e => {
-    const intervalId = setInterval(() => {
-        imgY += 5;
-        update();
-    }, 50);
-    document.addEventListener('pointerup', () => {        
-        clearInterval(intervalId)
-    }, { once: true })  
-});
-
-document.getElementById("left").addEventListener("pointerdown", e => {
-    const intervalId = setInterval(() => {
-        imgX -= 5;
-        update();
-    }, 50);
-    document.addEventListener('pointerup', () => {        
-        clearInterval(intervalId)
-    }, { once: true })  
-});
-
-document.getElementById("right").addEventListener("pointerdown", e => {
-    const intervalId = setInterval(() => {
-        imgX += 5;
-        update();
-    }, 50);
-    document.addEventListener('pointerup', () => {        
-        clearInterval(intervalId)
-    }, { once: true })  
-});
-
 function update() {
     ctx1.clearRect(0, 0, 1000, 1000);
     ctx1.save();
@@ -608,8 +495,6 @@ document.getElementById("scan").addEventListener("click", e => {
     sgf += sgfSetup;
     sgf += ")";
 
-    document.getElementById("result").innerText = sgf;
-
     const parent = document.getElementById("js-igo");
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
@@ -627,6 +512,9 @@ document.getElementById("scan").addEventListener("click", e => {
     gameView.fitBoardSizeToWindowAndParent();
 
     document.getElementById("fujigoban").href = "https://fujigoban.appspot.com/ai/?sgf=" + sgf;
+
+    document.getElementById("copy-wrapper").classList.remove("hide");
+    document.getElementById("fujigoban-wrapper").classList.remove("hide");
 
 });
 
