@@ -102,6 +102,19 @@ let drawFlag = false;
 let curx, cury;
 let sabunX, sabunY;
 
+document.getElementById("file").addEventListener("change", e => {
+
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    if (file) {
+        reader.onload = () => {
+            image.src = reader.result;
+        }
+    }
+});
+
 canvas2.addEventListener("mousemove", function(e) {
 
     if (!drawFlag) return;
