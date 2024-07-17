@@ -55,10 +55,7 @@
         本物の碁盤の写真、囲碁ソフトのスクショなどから、SGF形式のデータを作るためのツールです。
     </p>
     <p>
-        碁盤の画像を選択した後、格子状のグリッドが碁盤の目にピッタリ合うように、四隅の赤い丸<span style="color:red" class="text-shadow">●</span>を動かして調節してください。認識に成功した碁石には黄色の点<span style="color:yellow" class="text-shadow">●</span>が付きますので、すべての碁石が認識されるまで調整します。最後にスキャンボタンを押して完了です。
-    </p>
-    <p>
-        ただ、碁盤の写真の場合、真正面から撮影していること、盤面に光の反射が無いこと、などの条件を満たしていないと、なかなか上手に認識できません…。
+        碁盤の画像を選択した後、緑色の丸<span style="color:green" class="text-shadow">●</span>を動かして、四隅にピッタリ合うように調節してください。スキャンボタンを押すと、認識した黒石には黄色の点<span style="color:yellow" class="text-shadow">●</span>、白石には赤色の点<span style="color:red" class="text-shadow">●</span>が付きますので、すべての碁石が認識されるまで、緑の丸を調節して「スキャン」を繰り返します。
     </p>
     
     <hr style="margin-top:20px;margin-bottom: 20px;">
@@ -75,6 +72,9 @@
         <canvas id="canvas2" width="320" height="320" style="border: 1px solid #000"></canvas>
     </div>
     
+    <div style="text-align:center;">
+        <canvas id="rect" width="320" height="320" style="border: 1px solid #000;"></canvas>
+    </div>
     
     <div style="text-align:center; margin-top: 20px;">
         <button id="scan" class="button-success pure-button">スキャン</button>
@@ -262,133 +262,14 @@ function drawGrid() {
     ctx2.clearRect(0, 0, 1000, 1000);
 
     for ( i = 0 ; i < dt.length - 1 ; i++ ) {
-        drawLine(dt[i][0], dt[i][1], dt[i+1][0], dt[i+1][1], 1, "#0000ff");
+        drawLine(ctx2, dt[i][0], dt[i][1], dt[i+1][0], dt[i+1][1], 1, "#0000ff");
     }
 
-    drawLine(dt[0][0], dt[0][1], dt[3][0], dt[3][1], 1, "#0000ff") ;
+    drawLine(ctx2, dt[0][0], dt[0][1], dt[3][0], dt[3][1], 1, "#0000ff") ;
 
     for ( i = 0 ; i < dt.length ; i++ ) {
-        drawCircle(dt[i][0], dt[i][1], 5, "#ff0000");
+        drawCircle(ctx2, dt[i][0], dt[i][1], 5, "#00ff00");
     }
-
-    const pointsX1 = [];
-    const pointsY1 = [];
-
-    const stepX1 = (dt[3][0] - dt[0][0]) / (gobanSize - 1);
-    const stepY1 = (dt[3][1] - dt[0][1]) / (gobanSize - 1);
-    const stepX2 = (dt[2][0] - dt[1][0]) / (gobanSize - 1);
-    const stepY2 = (dt[2][1] - dt[1][1]) / (gobanSize - 1);
-
-    for (let index = 0; index <= (gobanSize - 1); index += 1) {
-        const x1 = dt[0][0] + stepX1 * index;
-        const y1 = dt[0][1] + stepY1 * index;
-        drawCircle(x1, y1, 2, "gray");
-
-        const x2 = dt[1][0] + stepX2 * index;
-        const y2 = dt[1][1] + stepY2 * index;
-        drawCircle(x2, y2, 2, "gray");
-
-        drawLine(x1, y1, x2, y2, 1, "gray");
-        pointsX1.push(x1);
-        pointsX1.push(x2);
-        pointsY1.push(y1);
-        pointsY1.push(y2);
-    }
-
-    const pointsX2 = [];
-    const pointsY2 = [];
-
-    const stepX3 = (dt[1][0] - dt[0][0]) / (gobanSize - 1);
-    const stepY3 = (dt[1][1] - dt[0][1]) / (gobanSize - 1);
-    const stepX4 = (dt[2][0] - dt[3][0]) / (gobanSize - 1);
-    const stepY4 = (dt[2][1] - dt[3][1]) / (gobanSize - 1);
-
-    for (let index = 0; index <= (gobanSize - 1); index += 1) {
-        const x1 = dt[0][0] + stepX3 * index;
-        let y1 = dt[0][1] + stepY3 * index;
-        const x2 = dt[3][0] + stepX4 * index;
-        let y2 = dt[3][1] + stepY4 * index;
-
-        if (gobanSize === 19 && (dt[0][0] - dt[1][0] > 5 || dt[2][0] - dt[3][0] > 5)) {
-            console.log("aaa", gobanSize, dt[0][0] - dt[1][0], dt[2][0] - dt[3][0]);
-            const y = trans3D(index, y1, y2);
-            y1 = y.y1;
-            y2 = y.y2;
-        }
-
-        drawCircle(x1, y1, 2, "gray");
-        drawCircle(x2, y2, 2, "gray");
-
-        drawLine(x1, y1, x2, y2, 1, "gray");
-        pointsX2.push(x1);
-        pointsX2.push(x2);
-        pointsY2.push(y1);
-        pointsY2.push(y2);
-    }
-
-    sgfSetup = "";
-    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split("");
-
-
-    for (let x = 0; x < pointsX1.length; x += 2) {
-        for (let y = 0; y < pointsY1.length; y += 2) {
-            const point = getIntersection(pointsX1[x], pointsY1[x], pointsX1[x + 1], pointsY1[x + 1],
-            pointsX2[y], pointsY2[y], pointsX2[y + 1], pointsY2[y + 1]);
-        
-            const color = getStoneColor(point.x, point.y);
-            if (color === "B") {
-                drawCircle(point.x, point.y, 3, "yellow");
-                sgfSetup += "AB[" + alphabet[x/2] + alphabet[y/2] + "]";
-            } else if (color === "W") {
-                drawCircle(point.x, point.y, 3, "yellow");
-                sgfSetup += "AW[" + alphabet[x/2] + alphabet[y/2] + "]";
-            // } else {
-            //     drawCircle(point.x, point.y, 3, "yellow");
-            }
-        }
-    }
-
-}
-
-function trans3D(index, y1, y2) {
-
-    switch (index) {
-        case 1:
-        case 2:
-        case 3:
-            y1 -= 3;
-            y2 -= 3;
-            break;
-        case 4:
-        case 5:
-        case 6:
-            y1 -= 4;
-            y2 -= 4;
-            break;
-        case 7:
-        case 8:
-        case 9:
-            y1 -= 5;
-            y2 -= 5;
-            break;
-        case 10:
-        case 11:
-        case 12:
-            y1 -= 5;
-            y2 -= 5;
-            break;
-        case 13:
-        case 14:
-            y1 -= 5;
-            y2 -= 5;
-            break;
-        case 15:
-            y1 -= 4;
-            y2 -= 4;
-            break;
-    }
-
-    return {y1: y1, y2: y2};
 
 }
 
@@ -412,33 +293,33 @@ function checkStartPoint(mx, my) {
     return false ; 
 }
 
-function drawCircle(x, y, r, c) {
+function drawCircle(ctx, x, y, r, c) {
 
     x = parseInt(x) ;
     y = parseInt(y) ;
     r = parseInt(r) ;
 
-    ctx2.beginPath();
+    ctx.beginPath();
 
-    ctx2.fillStyle = c;
-    ctx2.arc(x ,y ,r ,0, 2 * Math.PI, false) ;
-    ctx2.fill();
+    ctx.fillStyle = c;
+    ctx.arc(x ,y ,r ,0, 2 * Math.PI, false) ;
+    ctx.fill();
 
 }
 
-function drawLine(x1,y1,x2,y2,w,c) {  //直線の描画
+function drawLine(ctx, x1,y1,x2,y2,w,c) {
     x1 = parseInt(x1) ;
     y1 = parseInt(y1) ;
     x2 = parseInt(x2) ;
     y2 = parseInt(y2) ;
-    ctx2.globalAlpha = 1;
-    ctx2.beginPath();
-    ctx2.strokeStyle = c ;
-    ctx2.lineWidth = w ;
-    ctx2.moveTo( x1,y1 );
-    ctx2.lineTo( x2,y2 );
-    ctx2.stroke();
-    ctx2.closePath();
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.strokeStyle = c ;
+    ctx.lineWidth = w ;
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.closePath();
 }
 
 
@@ -453,76 +334,125 @@ function update() {
     ctx1.restore();
 }
 
-function getIntersection(xA, yA, xB, yB, xC, yC, xD, yD) {
-
-    let a1 = yA - yB,
-        a2 = yC - yD,
-        b1 = xB - xA,
-        b2 = xD - xC,
-        c1 = xA * (yB - yA) - yA * (xB - xA),
-        c2 = xC * (yD - yC) - yC * (xD - xC);
-
-    if (a1 * b2 == a2 * b1)
-        throw new Error("Invalid Coordinates");
-
-    let result = {};
-    result.x = (c2 * b1 - c1 * b2) / (a1 * b2 - a2 * b1);
-    result.y = (c2 * a1 - c1 * a2) / (b1 * a2 - b2 * a1);
-
-    return result;
-}
-
 // return "B" or "W" or ""
-function getStoneColor(x, y) {
+function getStoneColor(ctx, x, y) {
 
     const blackMax = 80;
-    const whiteMin = 130;
+    const whiteMin = 150;
+    const distance = 3;
 
-    const imagedata = ctx1.getImageData(x, y, 1, 1);
+    const imagedata = ctx.getImageData(x, y, 1, 1);
     const r = imagedata.data[0];
     const g = imagedata.data[1];
     const b = imagedata.data[2];
 
-    const imagedata1 = ctx1.getImageData(x + 3, y + 3, 1, 1);
+    const imagedata1 = ctx.getImageData(x + distance, y + distance, 1, 1);
     const r1 = imagedata1.data[0];
     const g1 = imagedata1.data[1];
     const b1 = imagedata1.data[2];
 
-    const imagedata2 = ctx1.getImageData(x + 3, y - 3, 1, 1);
+    const imagedata2 = ctx.getImageData(x + distance, y - distance, 1, 1);
     const r2 = imagedata2.data[0];
     const g2 = imagedata2.data[1];
     const b2 = imagedata2.data[2];
 
-    const imagedata3 = ctx1.getImageData(x - 3, y + 3, 1, 1);
+    const imagedata3 = ctx.getImageData(x - distance, y + distance, 1, 1);
     const r3 = imagedata3.data[0];
     const g3 = imagedata3.data[1];
     const b3 = imagedata3.data[2];
 
-    const imagedata4 = ctx1.getImageData(x - 3, y - 3, 1, 1);
+    const imagedata4 = ctx.getImageData(x - distance, y - distance, 1, 1);
     const r4 = imagedata4.data[0];
     const g4 = imagedata4.data[1];
     const b4 = imagedata4.data[2];
 
-    let isBlack = (r < blackMax && g < blackMax && b < blackMax)
-        && ((r1 < blackMax && g1 < blackMax && b1 < blackMax) || (r2 < blackMax && g2 < blackMax && b2 < blackMax) || (r3 < blackMax && g3 < blackMax && b3 < blackMax) || (r4 < blackMax && g4 < blackMax && b4 < blackMax));
+    let isBlack = booleanToNumber(r < blackMax && g < blackMax && b < blackMax) +
+        booleanToNumber(r1 < blackMax && g1 < blackMax && b1 < blackMax) +
+        booleanToNumber(r2 < blackMax && g2 < blackMax && b2 < blackMax) +
+        booleanToNumber(r3 < blackMax && g3 < blackMax && b3 < blackMax) +
+        booleanToNumber(r4 < blackMax && g4 < blackMax && b4 < blackMax) >= 2 ? true : false;
 
-    let isWhite = (r > whiteMin && g > whiteMin && b > whiteMin)
-        && ((r1 > whiteMin && g1 > whiteMin && b1 > whiteMin) || (r2 > whiteMin && g2 > whiteMin && b2 > whiteMin) || (r3 > whiteMin && g3 > whiteMin && b3 > whiteMin) || (r4 > whiteMin && g4 > whiteMin && b4 > whiteMin));
+    let isWhite = booleanToNumber(r > whiteMin && g > whiteMin && b > whiteMin) +
+        booleanToNumber(r1 > whiteMin && g1 > whiteMin && b1 > whiteMin) +
+        booleanToNumber(r2 > whiteMin && g2 > whiteMin && b2 > whiteMin) +
+        booleanToNumber(r3 > whiteMin && g3 > whiteMin && b3 > whiteMin) +
+        booleanToNumber(r4 > whiteMin && g4 > whiteMin && b4 > whiteMin) >= 2 ? true : false;
 
     // 黄色っぽい（青だけが低い）のなら碁盤の可能性が高い
-    if (isBlack && b1 < r1 - 10 && b1 < g1 - 10 && b2 < r2 - 10 && b2 < g2 - 10 && b3 < r3 - 10 && b3 < g3 - 10 && b4 < r4 - 10 && b4 < g4 - 10) {
-        isBlack = false;
-    }
-    if (isWhite && b1 < r1 - 10 && b1 < g1 - 10 && b2 < r2 - 10 && b2 < g2 - 10 && b3 < r3 - 10 && b3 < g3 - 10 && b4 < r4 - 10 && b4 < g4 - 10) {
-        isWhite = false;
-    }
+    // if (isBlack && b1 < r1 - 10 && b1 < g1 - 10 && b2 < r2 - 10 && b2 < g2 - 10 && b3 < r3 - 10 && b3 < g3 - 10 && b4 < r4 - 10 && b4 < g4 - 10) {
+    //     isBlack = false;
+    // }
+    // if (isWhite && b1 < r1 - 10 && b1 < g1 - 10 && b2 < r2 - 10 && b2 < g2 - 10 && b3 < r3 - 10 && b3 < g3 - 10 && b4 < r4 - 10 && b4 < g4 - 10) {
+    //     isWhite = false;
+    // }
 
-    return isBlack ? "B" : (isWhite ? "W" : "");
+    return isWhite ? "W" : (isBlack ? "B" : "");
+}
+
+function booleanToNumber(bool) {
+    return bool ? 1 : 0;
 }
 
 let sgf;
 
 document.getElementById("scan").addEventListener("click", e => {
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    const outputCanvas = document.getElementById("rect");
+    const outputImage = trasformToRectangle(
+        canvas1,
+        new Point(dt[0][0], dt[0][1]),
+        new Point(dt[3][0], dt[3][1]),
+        new Point(dt[1][0], dt[1][1]),
+        new Point(dt[2][0], dt[2][1]),
+        outputCanvas
+    );
+    const outputCavasCtx = outputCanvas.getContext("2d");
+    outputCavasCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+    outputCavasCtx.beginPath();
+    outputCavasCtx.rect( 0, 0, outputCanvas.width, outputCanvas.height);
+    outputCavasCtx.fillStyle = "#ecc656";
+    outputCavasCtx.fill();
+    outputCavasCtx.drawImage(outputImage, 10, 10)
+
+    sgfSetup = "";
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split("");
+
+    let xx = 0;
+    let yy = 0;
+
+    let last_x = -1;
+    let last_y = -1;
+
+    for (let x = 10; x <= outputCanvas.width - 10; x += (outputCanvas.width - 20) / (gobanSize - 1)) {
+        drawLine(outputCavasCtx, x, 10, x, outputCanvas.height - 10, 1, "#ecc656");
+    }
+    for (let y = 10; y <= outputCanvas.height - 10; y += (outputCanvas.height - 20) / (gobanSize - 1)) {
+        drawLine(outputCavasCtx, 10, y, outputCanvas.width - 10, y, 1, "#ecc656");
+    }
+
+    for (let x = 10; x <= (outputCanvas.width - 10); x += (outputCanvas.width - 20) / (gobanSize - 1)) {
+        for (let y = 10; y <= (outputCanvas.height - 10); y += (outputCanvas.height - 20) / (gobanSize - 1)) {
+            const color = getStoneColor(outputCavasCtx, x, y);
+            if (color === "B") {
+                drawCircle(outputCavasCtx, x, y, 3, "yellow");
+                sgfSetup += "AB[" + alphabet[xx] + alphabet[yy] + "]";
+            } else if (color === "W") {
+                drawCircle(outputCavasCtx, x, y, 3, "red");
+                sgfSetup += "AW[" + alphabet[xx] + alphabet[yy] + "]";
+            // } else {
+            //     drawCircle(outputCavasCtx, x, y, 2, "gray");
+            }
+            yy += 1;
+        }
+        yy = 0;
+        xx += 1;
+
+    }
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     sgf = "(;FF[4]GM[1]SZ[" + gobanSize + "]";
 
@@ -549,7 +479,8 @@ document.getElementById("scan").addEventListener("click", e => {
     document.getElementById("copy-wrapper").classList.remove("hide");
     document.getElementById("fujigoban-wrapper").classList.remove("hide");
 
-    window.scroll(0, document.documentElement.scrollHeight - document.documentElement.clientHeight);
+    // window.scroll(0, document.documentElement.scrollHeight - document.documentElement.clientHeight);
+
 });
 
 let jsIgoGameView;
@@ -598,10 +529,69 @@ canvas2.addEventListener("click", e => {
     var b = imagedata.data[2];
     var a = imagedata.data[3];
 
-    console.log(r, g, b, a);
+    console.log(canvasX, canvasY, r, g, b, a);
     
 });
+
+
+
+
+class Point {
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+  }
+}
+
+function trasformToRectangle(image, tl, tr, bl, br, outputShape) {
+  const canvas = document.createElement("canvas");
+  canvas.width = outputShape.width - 20;
+  canvas.height = outputShape.height - 20;
+  const context = canvas.getContext("2d");
+  const project = createProjection(tl, tr, bl, br);
+  for (let i = 0; i < canvas.width; i++) {
+    for (let j = 0; j < canvas.height; j++) {
+      const point = project(
+        new Point(i / canvas.width, j / canvas.height)
+      )
+      context.drawImage(image, point.x, point.y, 1, 1, i, j, 1, 1)
+    }
+  }
+  return canvas
+}
+
+function createProjection(tl, tr, bl, br) {
+  // 射影変換の係数を求める
+  // http://kondolab.org/archive/2010/research/cadcgtext/ChapE/ChapE02.html
+  const x2 = tr.x - tl.x
+  const y2 = tr.y - tl.y
+  const x3 = br.x - tl.x
+  const y3 = br.y - tl.y
+  const x4 = bl.x - tl.x
+  const y4 = bl.y - tl.y
+
+  const delta123 = x2 * y3 - x3 * y2
+  const delta124 = x2 * y4 - x4 * y2
+  const delta134 = x3 * y4 - x4 * y3
+  const delta1234 = delta123 + delta134
+  const delta234 = delta1234 - delta124
+
+  const a1 = delta134 * x2
+  const b1 = delta123 * x4
+  const a2 = delta134 * y2
+  const b2 = delta123 * y4
+  const a0 = delta134 - delta234
+  const b0 = delta123 - delta234
+  const c0 = delta234
+  return p =>
+    new Point(
+      (a1 * p.x + b1 * p.y) / (a0 * p.x + b0 * p.y + c0) + tl.x,
+      (a2 * p.x + b2 * p.y) / (a0 * p.x + b0 * p.y + c0) + tl.y
+    )
+}
+
 
 </script>
 
 </html>
+
